@@ -1,6 +1,6 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+/* const CopyWebpackPlugin = require("copy-webpack-plugin"); */
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const PATHS = {
@@ -47,12 +47,11 @@ pluginsOptions.push(
   })
 );
 
-pluginsOptions.push(
+/* pluginsOptions.push(
   new CopyWebpackPlugin([
-    /* { from: `${PATHS.src}/shared/img`, to: `${PATHS.assets}img` }, */
-    { from: `${PATHS.src}/static`, to: `static/` },
+    { from: `${PATHS.src}/shared/img`, to: `${PATHS.assets}img` },
   ])
-);
+); */
 
 module.exports = {
   externals: {

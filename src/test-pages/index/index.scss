@@ -1,12 +1,7 @@
-.test {
-  &-div {
-    height: 100px;
-    width: 100px;
-    background-color: red;
-  }
+@import "../../rangeSlider/styles/rangeSlider.scss";
 
-  &-button {
-    height: 100px;
-    width: 100px;
-  }
+.test-div {
+  margin-top: 20px;
+  margin-left: 20px;
+  width: 300px;
 }
