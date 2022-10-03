@@ -1,4 +1,4 @@
-import "./sliderParts/handlerHandle";
+import HandlerDragAndDrop from "./sliderParts/handlerHandle";
 
 class View {
   constructor() {}
@@ -18,7 +18,13 @@ class View {
     this.subscriptionHandleEvent(DOMSliderHandle);
   };
 
-  subscriptionHandleEvent = (DOMHandleButton: HTMLButtonElement): void => {};
+  subscriptionHandleEvent = (DOMSliderHandle: HTMLButtonElement): void => {
+    const handlerDragAndDrop: HandlerDragAndDrop = new HandlerDragAndDrop(
+      DOMSliderHandle
+    );
+
+    handlerDragAndDrop.addEvent();    
+  };
 }
 
 export default View;
