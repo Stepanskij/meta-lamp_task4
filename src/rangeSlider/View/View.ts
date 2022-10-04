@@ -15,15 +15,19 @@ class View {
     DOMRangeSlider.insertAdjacentElement("beforeend", DOMSliderRoller);
     DOMSliderRoller.insertAdjacentElement("beforeend", DOMSliderHandle);
 
-    this.subscriptionHandleEvent(DOMSliderHandle);
+    this.subscriptionHandleEvent(DOMSliderHandle, DOMRangeSlider);
   };
 
-  subscriptionHandleEvent = (DOMSliderHandle: HTMLButtonElement): void => {
+  subscriptionHandleEvent = (
+    DOMSliderHandle: HTMLButtonElement,
+    DOMRangeSlider: HTMLDivElement
+  ): void => {
     const handlerDragAndDrop: HandlerDragAndDrop = new HandlerDragAndDrop(
-      DOMSliderHandle
+      DOMSliderHandle,
+      DOMRangeSlider
     );
 
-    handlerDragAndDrop.addEvent();    
+    handlerDragAndDrop.addEvent();
   };
 }
 
