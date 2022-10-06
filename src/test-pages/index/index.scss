@@ -1,7 +1,9 @@
 @import "../../rangeSlider/styles/rangeSlider.scss";
 
 .test-div {
-  margin-top: 20px;
-  margin-left: 20px;
-  width: 300px;
+  &-1,
+  &-2 {
+    margin: 20px;
+    width: 300px;
+  }
 }

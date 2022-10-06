@@ -1,8 +1,10 @@
+import IModelData from "rangeSlider/Data/IModelData";
+
 class HandlerDragAndDrop {
   private clickPageX: number = 0;
   private rollerWidth: number = 0;
-  private numberSteps: number = 10;
-  private handleStepPositionMax: number = 10;
+  private numberSteps: number = 1;
+  private handleStepPositionMax: number;
   private stepWidth: number = 0;
   private handleStepPosition: number = 0;
   private handleStepPositionOnClick: number = 0;
@@ -10,10 +12,14 @@ class HandlerDragAndDrop {
 
   constructor(
     private DOMHandleButton: HTMLButtonElement,
-    private DOMRangeSliderDiv: HTMLDivElement
+    private DOMRangeSliderDiv: HTMLDivElement,
+    modelData: IModelData
   ) {
     this.DOMHandleButton = DOMHandleButton;
     this.DOMRangeSliderDiv = DOMRangeSliderDiv;
+
+    if (modelData.numberSteps) this.numberSteps = modelData.numberSteps;
+    this.handleStepPositionMax = this.numberSteps;
   }
 
   addEvent = (): void => {
