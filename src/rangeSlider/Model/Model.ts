@@ -1,37 +1,42 @@
 import IModelData from "rangeSlider/Data/IModelData";
 
 class Model {
-  maxValue: number = 100;
-  minValue: number = 0;
-  stepSize: number = 1;
-  numberSteps: number;
+  modelData: IModelData;
 
-  constructor() {
-    this.minValue;
-    this.maxValue;
-    this.stepSize;
-    this.numberSteps = this._getNumberSteps(
-      this.minValue,
-      this.maxValue,
-      this.stepSize
-    );
+  constructor(
+    modelData: IModelData = { maxValue: 100, minValue: 0, stepSize: 5 }
+  ) {
+    this.modelData = modelData;
+    this.fixMaxValue();
+    this.getNumberSteps();
   }
 
-  private _getNumberSteps = (
-    minValue: number,
-    maxValue: number,
-    stepSize: number
-  ): number => {
-    return (maxValue - minValue) / stepSize;
+  //Расчёт количества шагов(делений) слайдера.
+  getNumberSteps = (): void => {
+    if (
+      this.modelData.maxValue !== undefined &&
+      this.modelData.minValue !== undefined &&
+      this.modelData.stepSize !== undefined
+    ) {
+      this.modelData.numberSteps =
+        this.modelData.maxValue / this.modelData.stepSize;
+    }
   };
 
-  getModelData = (): IModelData => {
-    return {
-      maxValue: this.minValue,
-      minValue: this.maxValue,
-      stepSize: this.stepSize,
-      numberSteps: this.numberSteps,
-    };
+  //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
+  fixMaxValue = (): void => {
+    if (
+      this.modelData.maxValue !== undefined &&
+      this.modelData.minValue !== undefined &&
+      this.modelData.stepSize !== undefined
+    ) {
+      let remainder =
+        (this.modelData.maxValue - this.modelData.minValue) %
+        this.modelData.stepSize;
+      if (remainder)
+        this.modelData.maxValue =
+          this.modelData.maxValue + this.modelData.stepSize - remainder;
+    }
   };
 }
 

@@ -16,9 +16,10 @@ class Controller {
 
     this.model = new Model();
     this.view = new View();
+
   }
 
-  makeSlider = (): void => {
+  /* makeSlider = (): void => {
     this.DOMsSlider = this.view.createHTMLelements(this.DOMDiv);
     if (this.DOMsSlider.DOMSliderHandle)
       this.view.subscriptionHandleEvent(
@@ -26,7 +27,7 @@ class Controller {
         this.DOMsSlider.DOMRangeSlider,
         this.model.getModelData()
       );
-  };
+  }; */
 }
 
 export default Controller;
