@@ -3,7 +3,7 @@ import IModelData from "rangeSlider/Data/IModelData";
 class HandlerDragAndDrop {
   private clickPageX: number = 0;
   private rollerWidth: number = 0;
-  private numberSteps: number = 1;
+  private maxSteps: number = 1;
   private handleStepPositionMax: number;
   private stepWidth: number = 0;
   private handleStepPosition: number = 0;
@@ -18,8 +18,8 @@ class HandlerDragAndDrop {
     this.DOMHandleButton = DOMHandleButton;
     this.DOMRangeSliderDiv = DOMRangeSliderDiv;
 
-    if (modelData.numberSteps) this.numberSteps = modelData.numberSteps;
-    this.handleStepPositionMax = this.numberSteps;
+    if (modelData.maxSteps) this.maxSteps = modelData.maxSteps;
+    this.handleStepPositionMax = this.maxSteps;
   }
 
   addEvent = (): void => {
@@ -35,7 +35,7 @@ class HandlerDragAndDrop {
   private _handleMouseDown = (eventDown: MouseEvent): void => {
     this.clickPageX = eventDown.pageX; //координата X при клике, относительно страницы
     this.rollerWidth = this.DOMRangeSliderDiv.offsetWidth; //ширина ролика при клике, px
-    this.stepWidth = this.rollerWidth / this.numberSteps; //ширина одного шага ручки, px
+    this.stepWidth = this.rollerWidth / this.maxSteps; //ширина одного шага ручки, px
     this.handleStepPositionOnClick = this.handleStepPosition;
 
     document.addEventListener("mousemove", this._handleMouseMove);
@@ -49,7 +49,7 @@ class HandlerDragAndDrop {
       leftShift + this.handleStepPositionOnClick * this.stepWidth >
       this.stepWidth / 2 + this.handleStepPosition * this.stepWidth
     ) {
-      const stepPercent = 100 / this.numberSteps;
+      const stepPercent = 100 / this.maxSteps;
       this.handleStepPosition += 1;
       this.styleLeft = stepPercent * this.handleStepPosition;
       //
@@ -63,7 +63,7 @@ class HandlerDragAndDrop {
       leftShift + this.handleStepPositionOnClick * this.stepWidth <
       this.stepWidth / 2 + (this.handleStepPosition - 1) * this.stepWidth
     ) {
-      const stepPercent = 100 / this.numberSteps;
+      const stepPercent = 100 / this.maxSteps;
       this.handleStepPosition -= 1;
       this.styleLeft = stepPercent * this.handleStepPosition;
       //

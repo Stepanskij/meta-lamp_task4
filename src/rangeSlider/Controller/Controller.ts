@@ -16,18 +16,14 @@ class Controller {
 
     this.model = new Model();
     this.view = new View();
-
   }
 
-  /* makeSlider = (): void => {
-    this.DOMsSlider = this.view.createHTMLelements(this.DOMDiv);
-    if (this.DOMsSlider.DOMSliderHandle)
-      this.view.subscriptionHandleEvent(
-        this.DOMsSlider.DOMSliderHandle,
-        this.DOMsSlider.DOMRangeSlider,
-        this.model.getModelData()
-      );
-  }; */
+  makeSlider = (): void => {
+    let baseElements = this.view.createBaseElements(this.DOMDiv);
+    let handlesElements = this.view.createHandlesElements(baseElements[0], this.model.modelData)
+
+    console.log(handlesElements)
+  };
 }
 
 export default Controller;

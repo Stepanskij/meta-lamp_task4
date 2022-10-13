@@ -5,18 +5,17 @@ class Model {
 
   constructor(
     modelData: IModelData = {
-      maxValue: -10.796, //-10.796
-      minValue: -10.908, //-10.908
-      stepSize: 2.823, //2.823
+      maxValue: 100,
+      minValue: -10,
+      stepSize: 2,
       handles: [],
     }
   ) {
     this.modelData = modelData;
     this.fixMaxValue();
-    this.getNumberSteps();
+    this.getMaxSteps();
     this.addHandle(121);
     this.addHandle(-57);
-    console.log(this.modelData);
   }
 
   //Добавить/убрать рычажок. Добавить можно любое value.
@@ -49,13 +48,13 @@ class Model {
   };
 
   //Расчёт количества шагов (делений) слайдера.
-  getNumberSteps = (): void => {
+  getMaxSteps = (): void => {
     if (
       this.modelData.maxValue !== undefined &&
       this.modelData.minValue !== undefined &&
       this.modelData.stepSize !== undefined
     ) {
-      this.modelData.numberSteps = Math.round(
+      this.modelData.maxSteps = Math.round(
         (this.modelData.maxValue - this.modelData.minValue) /
           this.modelData.stepSize
       );

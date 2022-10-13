@@ -4,7 +4,7 @@ interface IModelData {
   maxValue?: number;
   minValue?: number;
   stepSize?: number;
-  numberSteps?: number;
+  maxSteps?: number;
   handles?: IHandles[];
 }
 

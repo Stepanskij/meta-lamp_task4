@@ -3,30 +3,45 @@ import HandlerDragAndDrop from "./sliderParts/handlerHandle";
 //импорт интерфейсов
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
+import IHandles from "rangeSlider/Data/IHandles";
 
 class View {
   constructor() {}
 
-  createHTMLelements = (DOMDiv: HTMLDivElement): IDOMsOfSlider => {
+  //Создание HTML-элементов, что не могут измениться.
+  createBaseElements = (DOMDiv: HTMLDivElement): HTMLDivElement[] => {
     const DOMRangeSlider = document.createElement("div");
     const DOMSliderRoller = document.createElement("div");
-    const DOMSliderHandle = document.createElement("button");
     DOMRangeSlider.className = "range-slider";
     DOMSliderRoller.className = "range-slider__slider-roller";
-    DOMSliderHandle.className = "range-slider__slider-handle";
-
     DOMDiv.insertAdjacentElement("beforeend", DOMRangeSlider);
     DOMRangeSlider.insertAdjacentElement("beforeend", DOMSliderRoller);
-    DOMSliderRoller.insertAdjacentElement("beforeend", DOMSliderHandle);
 
-    return {
-      DOMRangeSlider: DOMRangeSlider,
-      DOMSliderRoller: DOMSliderRoller,
-      DOMSliderHandle: DOMSliderHandle,
-    };
+    return [DOMRangeSlider, DOMSliderRoller];
   };
 
-  subscriptionHandleEvent = (
+  //Создание рычажков (HTML-элементов)
+  createHandlesElements = (
+    DOMSliderRoller: HTMLDivElement,
+    modelData: IModelData
+  ): HTMLDivElement[][] | undefined => {
+    const DOMHandleBody = modelData.handles?.map((handleObj, index) => {
+      const DOMHandleBody = document.createElement("div");
+      const DOMHandleView = document.createElement("div");
+      DOMHandleBody.className = "range-slider__handle-body";
+      DOMHandleBody.dataset.index = `${index}`;
+      DOMHandleView.className = "range-slider__handle-view";
+
+      DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
+      DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
+
+      return [DOMHandleBody, DOMHandleView];
+    });
+    //Возвращается массив DOM-объектов рычажков
+    return DOMHandleBody;
+  };
+
+  /* subscriptionHandleEvent = (
     DOMSliderHandle: HTMLButtonElement,
     DOMRangeSlider: HTMLDivElement,
     modelData: IModelData
@@ -38,7 +53,7 @@ class View {
     );
 
     handlerDragAndDrop.addEvent();
-  };
+  }; */
 }
 
 export default View;
