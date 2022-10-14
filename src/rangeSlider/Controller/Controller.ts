@@ -6,23 +6,40 @@ import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
 
 class Controller {
-  model: Model;
-  view: View;
-  DOMsSlider?: IDOMsOfSlider;
+  private model: Model;
+  private view: View;
+  private DOMsSlider: IDOMsOfSlider = {};
+  modelData: IModelData;
 
-  constructor(public DOMDiv: HTMLDivElement) {
+  constructor(private DOMDiv: HTMLDivElement) {
     this.DOMDiv = DOMDiv;
-    this.DOMsSlider;
 
     this.model = new Model();
     this.view = new View();
+
+    this.modelData = this.model.getModelData();
   }
 
   makeSlider = (): void => {
     let baseElements = this.view.createBaseElements(this.DOMDiv);
-    let handlesElements = this.view.createHandlesElements(baseElements[0], this.model.modelData)
+    this.DOMsSlider.DOMRangeSlider = baseElements[0];
+    this.DOMsSlider.DOMSliderRoller = baseElements[1];
+    const DOMSliderHandles = this.modelData.handles?.map(() => {
+      return this.view.createHandleElement(
+        this.DOMsSlider.DOMSliderRoller as HTMLDivElement
+      );
+    });
+    this.DOMsSlider.DOMSliderHandles = DOMSliderHandles as HTMLDivElement[][];
 
-    console.log(handlesElements)
+    console.log(this.DOMsSlider)
+  };
+
+  testFunction = (): void => {
+    this.model.addHandle(12);
+    this.model.addHandle(78);
+    this.model.addHandle(111);
+    this.model.addHandle(-9);
+    this.model.addHandle(-67);
   };
 }
 

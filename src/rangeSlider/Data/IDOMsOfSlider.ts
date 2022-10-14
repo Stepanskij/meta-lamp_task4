@@ -1,7 +1,7 @@
 interface IDOMsOfSlider {
   DOMRangeSlider?: HTMLDivElement;
   DOMSliderRoller?: HTMLDivElement;
-  DOMSliderHandle?: HTMLDivElement;
+  DOMSliderHandles?: HTMLDivElement[][];
 }
 
 export default IDOMsOfSlider;

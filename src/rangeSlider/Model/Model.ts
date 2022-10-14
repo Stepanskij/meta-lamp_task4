@@ -1,7 +1,7 @@
 import IModelData from "rangeSlider/Data/IModelData";
 
 class Model {
-  modelData: IModelData;
+  private modelData: IModelData;
 
   constructor(
     modelData: IModelData = {
@@ -14,32 +14,51 @@ class Model {
     this.modelData = modelData;
     this.fixMaxValue();
     this.getMaxSteps();
-    this.addHandle(121);
-    this.addHandle(-57);
   }
 
-  //Добавить/убрать рычажок. Добавить можно любое value.
-  addHandle = (value: number): void => {
+  //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
+  addHandle = (value?: number): void => {
     if (
-      this.modelData.maxValue !== undefined &&
+      this.modelData.maxSteps !== undefined &&
       this.modelData.minValue !== undefined &&
-      this.modelData.stepSize !== undefined
+      this.modelData.stepSize !== undefined &&
+      this.modelData.maxValue !== undefined
     ) {
-      //Корректировка value, учитывая размер шага stepSize (на correctValue) с расчётом номера шага рычажка.
-      let correctStep;
-      if (value > this.modelData.maxValue) {
-        correctStep =
-          (this.modelData.maxValue - this.modelData.minValue) /
-          this.modelData.stepSize;
-      } else if (value < this.modelData.minValue) {
-        correctStep = 0;
-      } else correctStep = this.modelData.maxValue / value;
-      correctStep = Math.round(correctStep);
-      let correctValue =
-        this.modelData.minValue + correctStep * this.modelData.stepSize;
-
-      //Помещение рычажка (объекта с данными) в массив.
-      this.modelData.handles?.push({ value: correctValue, step: correctStep });
+      if (value) {
+        //Корректировка value, учитывая размер шага stepSize (на correctValue) с расчётом номера шага рычажка.
+        let correctStep;
+        if (value > this.modelData.maxValue) {
+          correctStep =
+            Math.abs(this.modelData.maxValue - this.modelData.minValue) /
+            this.modelData.stepSize;
+        } else if (value < this.modelData.minValue) {
+          correctStep = 0;
+        } else {
+          correctStep =
+            Math.abs(value - this.modelData.minValue) / this.modelData.stepSize;
+        }
+        correctStep = Math.round(correctStep);
+        let correctValue =
+          this.modelData.minValue + correctStep * this.modelData.stepSize;
+        //Помещение рычажка (объекта с данными) в массив.
+        this.modelData.handles?.push({
+          value: correctValue,
+          step: correctStep,
+        });
+        //сортировка массива по возростанию handles.value.
+        this.modelData.handles?.sort((a, b): number => {
+          return a.value - b.value;
+        });
+      }
+      //Добавление рычажка крайне справо, если не передаётся value.
+      else {
+        this.modelData.handles?.push({
+          value:
+            this.modelData.minValue +
+            this.modelData.maxSteps * this.modelData.stepSize,
+          step: this.modelData.maxSteps,
+        });
+      }
     }
   };
   //Убрать крайний рычажок (последний, из массива).
@@ -75,6 +94,10 @@ class Model {
         this.modelData.maxValue =
           this.modelData.maxValue + this.modelData.stepSize - remainder;
     }
+  };
+
+  getModelData = (): IModelData => {
+    return this.modelData;
   };
 }
 

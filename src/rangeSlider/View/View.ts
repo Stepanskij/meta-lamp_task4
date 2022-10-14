@@ -21,24 +21,18 @@ class View {
   };
 
   //Создание рычажков (HTML-элементов)
-  createHandlesElements = (
-    DOMSliderRoller: HTMLDivElement,
-    modelData: IModelData
-  ): HTMLDivElement[][] | undefined => {
-    const DOMHandleBody = modelData.handles?.map((handleObj, index) => {
-      const DOMHandleBody = document.createElement("div");
-      const DOMHandleView = document.createElement("div");
-      DOMHandleBody.className = "range-slider__handle-body";
-      DOMHandleBody.dataset.index = `${index}`;
-      DOMHandleView.className = "range-slider__handle-view";
+  createHandleElement = (
+    DOMSliderRoller: HTMLDivElement
+  ): HTMLDivElement[] | undefined => {
+    const DOMHandleBody = document.createElement("div");
+    const DOMHandleView = document.createElement("div");
+    DOMHandleBody.className = "range-slider__handle-body";
+    DOMHandleView.className = "range-slider__handle-view";
 
-      DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
-      DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
+    DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
+    DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
 
-      return [DOMHandleBody, DOMHandleView];
-    });
-    //Возвращается массив DOM-объектов рычажков
-    return DOMHandleBody;
+    return [DOMHandleBody, DOMHandleView];
   };
 
   /* subscriptionHandleEvent = (

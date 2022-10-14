@@ -1,6 +1,6 @@
 interface IHandles {
   value: number;
-  step: number;
+  step?: number;
 }
 
 export default IHandles;
