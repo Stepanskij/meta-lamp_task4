@@ -11,13 +11,25 @@ class Controller {
   private DOMsSlider: IDOMsOfSlider = {};
   modelData: IModelData;
 
-  constructor(private DOMDiv: HTMLDivElement) {
+  constructor(
+    private DOMDiv: HTMLDivElement,
+    private userModelData?: IModelData
+  ) {
     this.DOMDiv = DOMDiv;
-
-    this.model = new Model();
+    this.model = new Model(userModelData);
     this.view = new View();
 
     this.modelData = this.model.getModelData();
+    this.makeSlider();
+
+    this.view.renderView(this.DOMsSlider, this.modelData);
+    //Вывод объектов модели и DOMs.
+    console.log(
+      "DOM-объекты                            ",
+      this.DOMsSlider,
+      "объект модели                          ",
+      this.modelData
+    );
   }
 
   makeSlider = (): void => {
@@ -30,16 +42,6 @@ class Controller {
       );
     });
     this.DOMsSlider.DOMSliderHandles = DOMSliderHandles as HTMLDivElement[][];
-
-    console.log(this.DOMsSlider)
-  };
-
-  testFunction = (): void => {
-    this.model.addHandle(12);
-    this.model.addHandle(78);
-    this.model.addHandle(111);
-    this.model.addHandle(-9);
-    this.model.addHandle(-67);
   };
 }
 

@@ -1,4 +1,5 @@
 import IModelData from "rangeSlider/Data/IModelData";
+import IHandles from "rangeSlider/Data/IHandles";
 
 class Model {
   private modelData: IModelData;
@@ -14,7 +15,18 @@ class Model {
     this.modelData = modelData;
     this.fixMaxValue();
     this.getMaxSteps();
+
+    this._reconstructionHandlesArray(this.modelData.handles as IHandles[]);
   }
+
+  //Создание массива рычажков при создании класса Model.
+  private _reconstructionHandlesArray = (handlesArray: IHandles[]): void => {
+    const handles = handlesArray;
+    this.modelData.handles = [];
+    handles.forEach((handleObj): void => {
+      this.addHandle(handleObj.value);
+    });
+  };
 
   //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
   addHandle = (value?: number): void => {

@@ -35,6 +35,25 @@ class View {
     return [DOMHandleBody, DOMHandleView];
   };
 
+  //Отрисовка элементов View по данным Model.
+  renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
+
+    //Постановка рычажка на своё место по шагу(step).
+    modelData.handles?.forEach((handleObj, index) => {
+      if (
+        handleObj.step !== undefined &&
+        modelData.maxSteps !== undefined &&
+        DOMsOfSlider.DOMSliderHandles !== undefined
+      ) {
+        const styleLeft = (handleObj.step / modelData.maxSteps) * 100;
+        DOMsOfSlider.DOMSliderHandles[index][0].setAttribute(
+          "style",
+          `left:${styleLeft}%`
+        );
+      }
+    });
+  };
+
   /* subscriptionHandleEvent = (
     DOMSliderHandle: HTMLButtonElement,
     DOMRangeSlider: HTMLDivElement,

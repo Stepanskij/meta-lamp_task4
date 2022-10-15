@@ -1,11 +1,12 @@
 import IHandles from "./IHandles";
 
-interface IModelData {
+interface IUserModelData {
   maxValue?: number;
   minValue?: number;
-  stepSize?: number;
+  stepSize?: number;  
   maxSteps?: number;
   handles?: IHandles[];
 }
 
-export default IModelData;
+export default IUserModelData;
+
