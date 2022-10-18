@@ -23,6 +23,7 @@ class Controller {
     this.makeSlider();
 
     this.view.renderView(this.DOMsSlider, this.modelData);
+
     //Вывод объектов модели и DOMs.
     console.log(
       "DOM-объекты                            ",
@@ -36,12 +37,22 @@ class Controller {
     let baseElements = this.view.createBaseElements(this.DOMDiv);
     this.DOMsSlider.DOMRangeSlider = baseElements[0];
     this.DOMsSlider.DOMSliderRoller = baseElements[1];
-    const DOMSliderHandles = this.modelData.handles?.map(() => {
+    const DOMSliderHandles = this.modelData.handles?.map((handleObj, index) => {
       return this.view.createHandleElement(
-        this.DOMsSlider.DOMSliderRoller as HTMLDivElement
+        this.DOMsSlider.DOMSliderRoller as HTMLDivElement,
+        index
       );
     });
     this.DOMsSlider.DOMSliderHandles = DOMSliderHandles as HTMLDivElement[][];
+
+    this.DOMsSlider.DOMSliderHandles.forEach((arrDOMsHandles) => {
+      if (this.DOMsSlider.DOMSliderRoller)
+        this.view.subscriptionHandleEvent(
+          arrDOMsHandles,
+          this.DOMsSlider.DOMSliderRoller,
+          this.modelData
+        );
+    });
   };
 }
 

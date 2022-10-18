@@ -11,42 +11,63 @@ class HandlerDragAndDrop {
   private styleLeft: number = 0;
 
   constructor(
-    private DOMHandleButton: HTMLButtonElement,
-    private DOMRangeSliderDiv: HTMLDivElement,
-    modelData: IModelData
+    private DOMsHandle: HTMLDivElement[],
+    private DOMSliderRoller: HTMLDivElement,
+    private modelData: IModelData
   ) {
-    this.DOMHandleButton = DOMHandleButton;
-    this.DOMRangeSliderDiv = DOMRangeSliderDiv;
+    this.DOMsHandle = DOMsHandle;
+    this.DOMSliderRoller = DOMSliderRoller;
 
     if (modelData.maxSteps) this.maxSteps = modelData.maxSteps;
     this.handleStepPositionMax = this.maxSteps;
   }
 
   addEvent = (): void => {
-    this.DOMHandleButton.addEventListener("mousedown", this._handleMouseDown);
+    this.DOMsHandle[1].addEventListener("mousedown", this._handleMouseDown);
+    this.DOMsHandle[1].addEventListener("touchstart", this._handleMouseDown);
   };
   removeEvent = (): void => {
-    this.DOMHandleButton.removeEventListener(
-      "mousedown",
-      this._handleMouseDown
-    );
+    this.DOMsHandle[1].removeEventListener("mousedown", this._handleMouseDown);
+    this.DOMsHandle[1].removeEventListener("touchstart", this._handleMouseDown);
   };
 
-  private _handleMouseDown = (eventDown: MouseEvent): void => {
-    this.clickPageX = eventDown.pageX; //координата X при клике, относительно страницы
-    this.rollerWidth = this.DOMRangeSliderDiv.offsetWidth; //ширина ролика при клике, px
-    this.stepWidth = this.rollerWidth / this.maxSteps; //ширина одного шага ручки, px
-    this.handleStepPositionOnClick = this.handleStepPosition;
-
+  private _handleMouseDown = (eventDown: UIEvent): void => {
+    //Запоминаем объект event.
+    let eventClick;
+    if (eventDown instanceof TouchEvent) {
+      eventClick = eventDown.changedTouches[0];
+    } else if (eventDown instanceof MouseEvent) {
+      eventClick = eventDown;
+    }
+    //
+    if (eventClick && this.modelData.handles) {
+      const eventElement = eventClick.target as HTMLDivElement;
+      this.clickPageX = eventClick.pageX; //Координата X при клике, относительно страницы.
+      this.rollerWidth = this.DOMSliderRoller.offsetWidth; //Ширина ролика при клике, px.
+      this.stepWidth = this.rollerWidth / this.maxSteps; //Ширина одного шага рычажка, px.
+      //Номер шага указанного рычажка.
+      this.handleStepPositionOnClick = this.modelData.handles[
+        Number(eventElement.dataset.index)
+      ].step as number;
+    }
     document.addEventListener("mousemove", this._handleMouseMove);
     document.addEventListener("mouseup", this._handleMouseUp);
+    document.addEventListener("touchmove", this._handleMouseMove);
+    document.addEventListener("touchend", this._handleMouseUp);
   };
-  private _handleMouseMove = (eventMove: MouseEvent): void => {
-    let leftShift = eventMove.pageX - this.clickPageX; //сдвиг мыши влево, px
+  private _handleMouseMove = (eventMove: UIEvent): void => {
+    let pageX: number = 0;
+    if (eventMove instanceof TouchEvent) {
+      pageX = eventMove.changedTouches[0].pageX;
+    } else if (eventMove instanceof MouseEvent) {
+      pageX = eventMove.pageX;
+    }
 
+    const rightShiftX = pageX - this.clickPageX; //Сдвиг мыши вправо, px.
+    console.log()
     //
     if (
-      leftShift + this.handleStepPositionOnClick * this.stepWidth >
+      rightShiftX + this.handleStepPositionOnClick * this.stepWidth >
       this.stepWidth / 2 + this.handleStepPosition * this.stepWidth
     ) {
       const stepPercent = 100 / this.maxSteps;
@@ -60,7 +81,7 @@ class HandlerDragAndDrop {
     }
     //
     if (
-      leftShift + this.handleStepPositionOnClick * this.stepWidth <
+      rightShiftX + this.handleStepPositionOnClick * this.stepWidth <
       this.stepWidth / 2 + (this.handleStepPosition - 1) * this.stepWidth
     ) {
       const stepPercent = 100 / this.maxSteps;
@@ -72,13 +93,14 @@ class HandlerDragAndDrop {
       this._renderSlider(this.styleLeft);
     }
   };
+  //Снимает ивенты движения и отжатия мыши/пальца с рычажка
   private _handleMouseUp = (): void => {
     document.removeEventListener("mousemove", this._handleMouseMove);
     document.removeEventListener("mouseup", this._handleMouseUp);
   };
-
+  //Задаёт указанный сдвиг влево для рычажка
   private _renderSlider = (styleLeft: number): void => {
-    this.DOMHandleButton.setAttribute("style", `left:${styleLeft}%`);
+    this.DOMsHandle[0].setAttribute("style", `left:${styleLeft}%`);
   };
 }
 

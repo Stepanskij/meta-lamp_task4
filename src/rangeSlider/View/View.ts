@@ -22,12 +22,14 @@ class View {
 
   //Создание рычажков (HTML-элементов)
   createHandleElement = (
-    DOMSliderRoller: HTMLDivElement
+    DOMSliderRoller: HTMLDivElement,
+    index: number
   ): HTMLDivElement[] | undefined => {
     const DOMHandleBody = document.createElement("div");
     const DOMHandleView = document.createElement("div");
     DOMHandleBody.className = "range-slider__handle-body";
     DOMHandleView.className = "range-slider__handle-view";
+    DOMHandleView.dataset.index = `${index}`;
 
     DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
     DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
@@ -37,7 +39,6 @@ class View {
 
   //Отрисовка элементов View по данным Model.
   renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
-
     //Постановка рычажка на своё место по шагу(step).
     modelData.handles?.forEach((handleObj, index) => {
       if (
@@ -54,19 +55,19 @@ class View {
     });
   };
 
-  /* subscriptionHandleEvent = (
-    DOMSliderHandle: HTMLButtonElement,
-    DOMRangeSlider: HTMLDivElement,
+  subscriptionHandleEvent = (
+    DOMSliderHandle: HTMLDivElement[],
+    DOMSliderRoller: HTMLDivElement,
     modelData: IModelData
   ): void => {
     const handlerDragAndDrop: HandlerDragAndDrop = new HandlerDragAndDrop(
       DOMSliderHandle,
-      DOMRangeSlider,
+      DOMSliderRoller,
       modelData
     );
 
     handlerDragAndDrop.addEvent();
-  }; */
+  };
 }
 
 export default View;
