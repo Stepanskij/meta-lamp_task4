@@ -1,26 +1,19 @@
 import IModelData from "rangeSlider/Data/IModelData";
+import IHandles from "rangeSlider/Data/IHandles";
 
 class HandlerDragAndDrop {
   private clickPageX: number = 0;
   private rollerWidth: number = 0;
-  private maxSteps: number = 1;
-  private handleStepPositionMax: number;
   private stepWidth: number = 0;
-  private handleStepPosition: number = 0;
-  private handleStepPositionOnClick: number = 0;
+  private handleObj?: IHandles;
   private styleLeft: number = 0;
+  private rollerPageX: number = 0;
 
   constructor(
     private DOMsHandle: HTMLDivElement[],
     private DOMSliderRoller: HTMLDivElement,
     private modelData: IModelData
-  ) {
-    this.DOMsHandle = DOMsHandle;
-    this.DOMSliderRoller = DOMSliderRoller;
-
-    if (modelData.maxSteps) this.maxSteps = modelData.maxSteps;
-    this.handleStepPositionMax = this.maxSteps;
-  }
+  ) {}
 
   addEvent = (): void => {
     this.DOMsHandle[1].addEventListener("mousedown", this._handleMouseDown);
@@ -39,21 +32,22 @@ class HandlerDragAndDrop {
     } else if (eventDown instanceof MouseEvent) {
       eventClick = eventDown;
     }
-    //
-    if (eventClick && this.modelData.handles) {
-      const eventElement = eventClick.target as HTMLDivElement;
-      this.clickPageX = eventClick.pageX; //Координата X при клике, относительно страницы.
-      this.rollerWidth = this.DOMSliderRoller.offsetWidth; //Ширина ролика при клике, px.
-      this.stepWidth = this.rollerWidth / this.maxSteps; //Ширина одного шага рычажка, px.
-      //Номер шага указанного рычажка.
-      this.handleStepPositionOnClick = this.modelData.handles[
-        Number(eventElement.dataset.index)
-      ].step as number;
+    //Запоминание неизменных свойств при клике на рычажок.
+    if (eventClick && this.modelData.handles && this.modelData.maxSteps) {
+      const eventElement = eventClick.target as HTMLDivElement; //view-элемент рычажка.
+      this.rollerWidth =
+        this.DOMSliderRoller.offsetWidth - this.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
+      this.stepWidth = this.rollerWidth / this.modelData.maxSteps; //Ширина одного шага рычажка, px.
+      this.handleObj =
+        this.modelData.handles[Number(eventElement.dataset.index)]; //Data-объект рычажка.
     }
+    this.rollerPageX = this._getPositionElement(this.DOMSliderRoller).left; //Левый отступ ролика относительно страницы.
+    //
     document.addEventListener("mousemove", this._handleMouseMove);
-    document.addEventListener("mouseup", this._handleMouseUp);
     document.addEventListener("touchmove", this._handleMouseMove);
+    document.addEventListener("mouseup", this._handleMouseUp);
     document.addEventListener("touchend", this._handleMouseUp);
+    console.log(this.modelData.handles)
   };
   private _handleMouseMove = (eventMove: UIEvent): void => {
     let pageX: number = 0;
@@ -63,34 +57,19 @@ class HandlerDragAndDrop {
       pageX = eventMove.pageX;
     }
 
-    const rightShiftX = pageX - this.clickPageX; //Сдвиг мыши вправо, px.
-    console.log()
-    //
-    if (
-      rightShiftX + this.handleStepPositionOnClick * this.stepWidth >
-      this.stepWidth / 2 + this.handleStepPosition * this.stepWidth
-    ) {
-      const stepPercent = 100 / this.maxSteps;
-      this.handleStepPosition += 1;
-      this.styleLeft = stepPercent * this.handleStepPosition;
-      //
-      if (this.styleLeft > 100) this.styleLeft = 100;
-      if (this.handleStepPosition > this.handleStepPositionMax)
-        this.handleStepPosition = this.handleStepPositionMax;
-      this._renderSlider(this.styleLeft);
-    }
-    //
-    if (
-      rightShiftX + this.handleStepPositionOnClick * this.stepWidth <
-      this.stepWidth / 2 + (this.handleStepPosition - 1) * this.stepWidth
-    ) {
-      const stepPercent = 100 / this.maxSteps;
-      this.handleStepPosition -= 1;
-      this.styleLeft = stepPercent * this.handleStepPosition;
-      //
-      if (this.styleLeft < 0) this.styleLeft = 0;
-      if (this.handleStepPosition < 0) this.handleStepPosition = 0;
-      this._renderSlider(this.styleLeft);
+    const rightShiftX = pageX - this.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
+
+    let stepNow = Math.round(rightShiftX / this.stepWidth);
+    if (this.modelData.maxSteps && this.modelData.stepSize && this.handleObj) {
+      if (stepNow < 0) {
+        stepNow = 0;
+      } else if (stepNow > this.modelData.maxSteps) {
+        stepNow = this.modelData.maxSteps;
+      }
+      this.handleObj.step = stepNow;
+      this.handleObj.value = stepNow * this.modelData.stepSize;
+      const styleLeft = (stepNow / this.modelData.maxSteps) * 100;
+      this._renderHandle(styleLeft);
     }
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка
@@ -99,8 +78,27 @@ class HandlerDragAndDrop {
     document.removeEventListener("mouseup", this._handleMouseUp);
   };
   //Задаёт указанный сдвиг влево для рычажка
-  private _renderSlider = (styleLeft: number): void => {
+  private _renderHandle = (styleLeft: number): void => {
     this.DOMsHandle[0].setAttribute("style", `left:${styleLeft}%`);
+  };
+
+  private _getPositionElement = (
+    HTMLElement: HTMLElement
+  ): { top: number; left: number } => {
+    const elementObj = HTMLElement.getBoundingClientRect();
+
+    const docEl = document.documentElement;
+
+    const scrollTop = docEl.scrollTop; //Прокрученная часть страницы по вертикали, px.
+    const scrollLeft = docEl.scrollLeft; //Прокрученная часть страницы по горизонтали, px.
+
+    const clientTop = this.DOMSliderRoller.clientTop; //Ширина border сверху, px.
+    const clientLeft = this.DOMSliderRoller.clientLeft; //Ширина border слева, px.
+
+    const top = elementObj.top + scrollTop - clientTop;
+    const left = elementObj.left + scrollLeft - clientLeft;
+
+    return { top: Math.round(top), left: Math.round(left) };
   };
 }
 

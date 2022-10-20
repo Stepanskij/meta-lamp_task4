@@ -5,10 +5,12 @@
 
   &__slider-roller {
     position: absolute;
+    display: flex;
+    align-items: center;
     width: 100%;
-    height: 5px;
+    height: 2.5px;
     background-color: white;
-    border: 0.3px solid black;
+    border: 0.5px solid black;
   }
 
   &__handle {
@@ -16,7 +18,6 @@
       position: absolute;
       width: 10px;
       height: 10px;
-      top: -2.5px;
     }
     &-view {
       position: relative;
