@@ -47,7 +47,7 @@ class HandlerDragAndDrop {
     document.addEventListener("touchmove", this._handleMouseMove);
     document.addEventListener("mouseup", this._handleMouseUp);
     document.addEventListener("touchend", this._handleMouseUp);
-    console.log(this.modelData.handles)
+    console.log(this.modelData.handles);
   };
   private _handleMouseMove = (eventMove: UIEvent): void => {
     let pageX: number = 0;
@@ -60,16 +60,23 @@ class HandlerDragAndDrop {
     const rightShiftX = pageX - this.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
 
     let stepNow = Math.round(rightShiftX / this.stepWidth);
-    if (this.modelData.maxSteps && this.modelData.stepSize && this.handleObj) {
+    if (
+      this.modelData.maxSteps &&
+      this.modelData.minValue &&
+      this.modelData.stepSize &&
+      this.handleObj
+    ) {
       if (stepNow < 0) {
         stepNow = 0;
       } else if (stepNow > this.modelData.maxSteps) {
         stepNow = this.modelData.maxSteps;
       }
       this.handleObj.step = stepNow;
-      this.handleObj.value = stepNow * this.modelData.stepSize;
+      this.handleObj.value =
+        this.modelData.minValue + stepNow * this.modelData.stepSize;
       const styleLeft = (stepNow / this.modelData.maxSteps) * 100;
       this._renderHandle(styleLeft);
+      this.DOMsHandle[3].innerHTML = `${this.handleObj.value}`;
     }
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка

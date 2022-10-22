@@ -27,19 +27,25 @@ class View {
   ): HTMLDivElement[] | undefined => {
     const DOMHandleBody = document.createElement("div");
     const DOMHandleView = document.createElement("div");
+    const DOMHandleValue = document.createElement("div");
+    const DOMHandleValueText = document.createElement("div");
     DOMHandleBody.className = "range-slider__handle-body";
     DOMHandleView.className = "range-slider__handle-view";
+    DOMHandleValue.className = "range-slider__handle-value";
+    DOMHandleValueText.className = "range-slider__handle-value-text";
     DOMHandleView.dataset.index = `${index}`;
 
     DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
+    DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleValue);
+    DOMHandleValue.insertAdjacentElement("beforeend", DOMHandleValueText);
     DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
 
-    return [DOMHandleBody, DOMHandleView];
+    return [DOMHandleBody, DOMHandleView, DOMHandleValue, DOMHandleValueText];
   };
 
   //Отрисовка элементов View по данным Model.
   renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
-    //Постановка рычажка на своё место по шагу(step).
+    //Постановка рычажков на своё место по шагу(step).
     modelData.handles?.forEach((handleObj, index) => {
       if (
         handleObj.step !== undefined &&
@@ -52,6 +58,14 @@ class View {
           `left:${styleLeft}%`
         );
       }
+
+      modelData.handles?.forEach((handleObj, index) => {
+        if (DOMsOfSlider.DOMSliderHandles) {
+          DOMsOfSlider.DOMSliderHandles[
+            index
+          ][3].innerHTML = `${handleObj.value}`;
+        }
+      });
     });
   };
 
