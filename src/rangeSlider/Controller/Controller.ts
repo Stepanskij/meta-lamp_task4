@@ -16,21 +16,13 @@ class Controller {
     private userModelData?: IModelData
   ) {
     this.DOMDiv = DOMDiv;
-    this.model = new Model(userModelData);
+    this.model = new Model(userModelData as IModelData);
     this.view = new View();
 
     this.modelData = this.model.getModelData();
     this.makeSlider();
 
     this.view.renderView(this.DOMsSlider, this.modelData);
-
-    //Вывод объектов модели и DOMs.
-    console.log(
-      "DOM-объекты                            ",
-      this.DOMsSlider,
-      "объект модели                          ",
-      this.modelData
-    );
   }
 
   makeSlider = (): void => {

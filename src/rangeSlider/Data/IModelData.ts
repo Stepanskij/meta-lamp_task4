@@ -1,4 +1,5 @@
 import IHandles from "./IHandles";
+import IScaleData from "./IScaleData";
 
 interface IModelData {
   maxValue?: number;
@@ -6,6 +7,7 @@ interface IModelData {
   stepSize?: number;  
   maxSteps?: number;
   handles?: IHandles[];
+  scaleData?:IScaleData;
 }
 
 export default IModelData;

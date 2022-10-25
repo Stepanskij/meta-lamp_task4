@@ -2,11 +2,9 @@ import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
 
 class HandlerDragAndDrop {
-  private clickPageX: number = 0;
   private rollerWidth: number = 0;
   private stepWidth: number = 0;
   private handleObj?: IHandles;
-  private styleLeft: number = 0;
   private rollerPageX: number = 0;
 
   constructor(
@@ -47,7 +45,6 @@ class HandlerDragAndDrop {
     document.addEventListener("touchmove", this._handleMouseMove);
     document.addEventListener("mouseup", this._handleMouseUp);
     document.addEventListener("touchend", this._handleMouseUp);
-    console.log(this.modelData.handles);
   };
   private _handleMouseMove = (eventMove: UIEvent): void => {
     let pageX: number = 0;

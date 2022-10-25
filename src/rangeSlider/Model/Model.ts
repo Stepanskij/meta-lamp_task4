@@ -1,28 +1,28 @@
 import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
+import IScaleData from "rangeSlider/Data/IScaleData";
+
+import scaleDataMethods from "./modelParts/scaleDataMethods";
 
 class Model {
   private modelData: IModelData;
+  private scaleDataMethods: scaleDataMethods;
 
-  constructor(
-    modelData: IModelData = {
-      maxValue: 100,
-      minValue: -10,
-      stepSize: 2,
-      handles: [],
-    }
-  ) {
+  constructor(modelData: IModelData) {
     this.modelData = modelData;
-    this.fixMaxValue();
-    this.getMaxSteps();
+    this._makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
+    this.fixMaxValue(); //Исправляет максимальное значение.
+    this.getMaxSteps(); //Расчитывает колличество делений ролика.
+    this._reconstructionHandlesArray(this.modelData.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
 
-    this._reconstructionHandlesArray(this.modelData.handles as IHandles[]);
+    this.scaleDataMethods = new scaleDataMethods(this.modelData);
   }
 
   //Создание массива рычажков при создании класса Model.
   private _reconstructionHandlesArray = (handlesArray: IHandles[]): void => {
     const handles = handlesArray;
     this.modelData.handles = [];
+
     handles.forEach((handleObj): void => {
       this.addHandle(handleObj.value);
     });
@@ -31,12 +31,12 @@ class Model {
   //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
   addHandle = (value?: number): void => {
     if (
-      this.modelData.maxSteps !== undefined &&
       this.modelData.minValue !== undefined &&
+      this.modelData.maxValue !== undefined &&
       this.modelData.stepSize !== undefined &&
-      this.modelData.maxValue !== undefined
+      this.modelData.maxSteps !== undefined
     ) {
-      if (value) {
+      if (value !== undefined) {
         //Корректировка value, учитывая размер шага stepSize (на correctValue) с расчётом номера шага рычажка.
         let correctStep;
         if (value > this.modelData.maxValue) {
@@ -110,6 +110,16 @@ class Model {
 
   getModelData = (): IModelData => {
     return this.modelData;
+  };
+
+  private _makeDefaultModelValues = (): void => {
+    const modelData = this.modelData;
+    if (modelData.minValue === undefined) modelData.minValue = -10;
+    if (modelData.stepSize === undefined) modelData.stepSize = 1;
+    if (modelData.maxValue === undefined) modelData.maxValue = 10;
+    if (modelData.handles === undefined) modelData.handles = [{ value: 0 }];
+    if (modelData.scaleData === undefined)
+      modelData.scaleData = { customMark: [], numberAutoMark: 0 };
   };
 }
 

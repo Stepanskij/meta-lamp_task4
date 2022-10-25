@@ -3,7 +3,6 @@ import HandlerDragAndDrop from "./sliderParts/handlerHandle";
 //импорт интерфейсов
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
-import IHandles from "rangeSlider/Data/IHandles";
 
 class View {
   constructor() {}
@@ -19,12 +18,11 @@ class View {
 
     return [DOMRangeSlider, DOMSliderRoller];
   };
-
   //Создание рычажков (HTML-элементов)
   createHandleElement = (
     DOMSliderRoller: HTMLDivElement,
     index: number
-  ): HTMLDivElement[] | undefined => {
+  ): HTMLDivElement[] => {
     const DOMHandleBody = document.createElement("div");
     const DOMHandleView = document.createElement("div");
     const DOMHandleValue = document.createElement("div");
@@ -42,7 +40,8 @@ class View {
 
     return [DOMHandleBody, DOMHandleView, DOMHandleValue, DOMHandleValueText];
   };
-
+  //Создание шкалы масштаба.
+  createScaleElement = (): void => {};
   //Отрисовка элементов View по данным Model.
   renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
     //Постановка рычажков на своё место по шагу(step).
@@ -69,6 +68,7 @@ class View {
     });
   };
 
+  //Подписание рычажков на события перетаскивания.
   subscriptionHandleEvent = (
     DOMSliderHandle: HTMLDivElement[],
     DOMSliderRoller: HTMLDivElement,
@@ -79,7 +79,6 @@ class View {
       DOMSliderRoller,
       modelData
     );
-
     handlerDragAndDrop.addEvent();
   };
 }

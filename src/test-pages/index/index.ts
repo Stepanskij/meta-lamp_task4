@@ -7,10 +7,9 @@ const DOMTestSlider1: HTMLDivElement | null =
   document.querySelector(".test-div-1");
 
 const userModelData: IModelData = {
-  maxValue: 20000,
-  minValue: -100,
-  stepSize: 1300,
-  handles: [{ value: -10 }, { value: 3000 }],
+  stepSize: 3,
+  maxValue: 40,
+  scaleData: { customMark: [6, 8.6, 0], numberAutoMark: 5 },
 };
 
 const controller1 = new Controller(
