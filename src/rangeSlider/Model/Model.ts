@@ -119,7 +119,7 @@ class Model {
     if (modelData.maxValue === undefined) modelData.maxValue = 10;
     if (modelData.handles === undefined) modelData.handles = [{ value: 0 }];
     if (modelData.scaleData === undefined)
-      modelData.scaleData = { customMark: [], numberAutoMark: 0 };
+      modelData.scaleData = { customMarkArray: [], numberAutoMark: 0 };
   };
 }
 
