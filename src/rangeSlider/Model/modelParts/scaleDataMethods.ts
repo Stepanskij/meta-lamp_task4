@@ -121,6 +121,10 @@ class scaleDataMethods {
           return array.indexOf(number) === index;
         }
       );
+      //Сортировка значений по возростанию.
+      this.scaleData.markArray.sort((a, b) => {
+        return a - b;
+      });
     }
   };
 }

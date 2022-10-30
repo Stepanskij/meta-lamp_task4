@@ -5,11 +5,11 @@ import IScaleData from "rangeSlider/Data/IScaleData";
 import scaleDataMethods from "./modelParts/scaleDataMethods";
 
 class Model {
-  private modelData: IModelData;
+  private modelData: IModelData = {};
   private scaleDataMethods: scaleDataMethods;
 
-  constructor(modelData: IModelData) {
-    this.modelData = modelData;
+  constructor(modelData?: IModelData) {
+    if (modelData) this.modelData = modelData;
     this._makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
     this.fixMaxValue(); //Исправляет максимальное значение.
     this.getMaxSteps(); //Расчитывает колличество делений ролика.

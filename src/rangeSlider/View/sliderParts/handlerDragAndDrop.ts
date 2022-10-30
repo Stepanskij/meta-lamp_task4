@@ -1,5 +1,6 @@
 import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
+import IDOMsSliderHandles from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
 
 class HandlerDragAndDrop {
   private rollerWidth: number = 0;
@@ -8,18 +9,34 @@ class HandlerDragAndDrop {
   private rollerPageX: number = 0;
 
   constructor(
-    private DOMsHandle: HTMLDivElement[],
+    private DOMsHandle: IDOMsSliderHandles,
     private DOMSliderRoller: HTMLDivElement,
     private modelData: IModelData
   ) {}
 
   addEvent = (): void => {
-    this.DOMsHandle[1].addEventListener("mousedown", this._handleMouseDown);
-    this.DOMsHandle[1].addEventListener("touchstart", this._handleMouseDown);
+    if (this.DOMsHandle.DOMHandleView) {
+      this.DOMsHandle.DOMHandleView.addEventListener(
+        "mousedown",
+        this._handleMouseDown
+      );
+      this.DOMsHandle.DOMHandleView.addEventListener(
+        "touchstart",
+        this._handleMouseDown
+      );
+    }
   };
   removeEvent = (): void => {
-    this.DOMsHandle[1].removeEventListener("mousedown", this._handleMouseDown);
-    this.DOMsHandle[1].removeEventListener("touchstart", this._handleMouseDown);
+    if (this.DOMsHandle.DOMHandleView) {
+      this.DOMsHandle.DOMHandleView.removeEventListener(
+        "mousedown",
+        this._handleMouseDown
+      );
+      this.DOMsHandle.DOMHandleView.removeEventListener(
+        "touchstart",
+        this._handleMouseDown
+      );
+    }
   };
 
   private _handleMouseDown = (eventDown: UIEvent): void => {
@@ -61,7 +78,8 @@ class HandlerDragAndDrop {
       this.modelData.maxSteps &&
       this.modelData.minValue &&
       this.modelData.stepSize &&
-      this.handleObj
+      this.handleObj &&
+      this.DOMsHandle.DOMHandleValueText
     ) {
       if (stepNow < 0) {
         stepNow = 0;
@@ -73,7 +91,7 @@ class HandlerDragAndDrop {
         this.modelData.minValue + stepNow * this.modelData.stepSize;
       const styleLeft = (stepNow / this.modelData.maxSteps) * 100;
       this._renderHandle(styleLeft);
-      this.DOMsHandle[3].innerHTML = `${this.handleObj.value}`;
+      this.DOMsHandle.DOMHandleValueText.innerHTML = `${this.handleObj.value}`;
     }
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка
@@ -83,7 +101,8 @@ class HandlerDragAndDrop {
   };
   //Задаёт указанный сдвиг влево для рычажка
   private _renderHandle = (styleLeft: number): void => {
-    this.DOMsHandle[0].setAttribute("style", `left:${styleLeft}%`);
+    if (this.DOMsHandle.DOMHandleBody)
+      this.DOMsHandle.DOMHandleBody.setAttribute("style", `left:${styleLeft}%`);
   };
 
   private _getPositionElement = (

@@ -13,6 +13,39 @@
     border: 0.5px solid black;
   }
 
+  &__scale-container {
+    position: absolute;
+    display: flex;
+    top: 2.5px;
+    width: 100%;
+    height: min-content;
+  }
+
+  &__scale-mark {
+    &-container {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+    }
+    &-separator {
+      height: 5px;
+      width: 0.2px;
+      background-color: black;
+    }
+    &-value {
+      max-width: 10px;
+      width: 10px;
+      height: 5px;
+      font-size: 5px;
+      user-select: none;
+      &-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
   &__handle {
     &-body {
       position: absolute;
