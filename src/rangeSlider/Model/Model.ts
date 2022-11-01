@@ -1,6 +1,5 @@
 import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
-import IScaleData from "rangeSlider/Data/IScaleData";
 
 import scaleDataMethods from "./modelParts/scaleDataMethods";
 
@@ -118,8 +117,14 @@ class Model {
     if (modelData.stepSize === undefined) modelData.stepSize = 1;
     if (modelData.maxValue === undefined) modelData.maxValue = 10;
     if (modelData.handles === undefined) modelData.handles = [{ value: 0 }];
-    if (modelData.scaleData === undefined)
-      modelData.scaleData = { customMarkArray: [], numberAutoMark: 0 };
+    if (modelData.handlesCanPushed === undefined)
+      modelData.handlesCanPushed = false;
+    if (modelData.scaleData !== undefined) {
+      if (modelData.scaleData.customMarkArray === undefined)
+        modelData.scaleData.customMarkArray = [];
+      if (modelData.scaleData.numberAutoMark === undefined)
+        modelData.scaleData.numberAutoMark = 0;
+    }
   };
 }
 

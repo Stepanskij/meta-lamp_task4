@@ -30,25 +30,25 @@ class View {
     DOMSliderRoller: HTMLDivElement,
     index: number
   ): HTMLDivElement[] => {
-    const DOMHandleBody = document.createElement("div");
-    DOMHandleBody.className = "range-slider__handle-body";
+    const DOMHandleContainer = document.createElement("div");
+    DOMHandleContainer.className = "range-slider__handle-container";
     //
     const DOMHandleView = document.createElement("div");
     DOMHandleView.className = "range-slider__handle-view";
+    DOMHandleView.dataset.index = `${index}`;
     //
     const DOMHandleValue = document.createElement("div");
     DOMHandleValue.className = "range-slider__handle-value";
     //
     const DOMHandleValueText = document.createElement("div");
     DOMHandleValueText.className = "range-slider__handle-value-text";
-    DOMHandleView.dataset.index = `${index}`;
     //
-    DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleBody);
-    DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleValue);
+    DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleContainer);
+    DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleValue);
     DOMHandleValue.insertAdjacentElement("beforeend", DOMHandleValueText);
-    DOMHandleBody.insertAdjacentElement("beforeend", DOMHandleView);
+    DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleView);
     //
-    return [DOMHandleBody, DOMHandleView, DOMHandleValue, DOMHandleValueText];
+    return [DOMHandleContainer, DOMHandleView, DOMHandleValue, DOMHandleValueText];
   };
   //Создание метки шкалы масштаба.
   createScaleMarker = (DOMsOfSlider: IDOMsOfSlider): HTMLDivElement[] => {
@@ -127,7 +127,7 @@ class View {
       ) {
         const styleLeft = (handleObj.step / modelData.maxSteps) * 100;
         (
-          DOMsOfSlider.DOMsSliderHandles[index].DOMHandleBody as HTMLElement
+          DOMsOfSlider.DOMsSliderHandles[index].DOMHandleContainer as HTMLDivElement
         ).setAttribute("style", `left:${styleLeft}%`);
       }
       //Перерисовка значений облачков над рычажками.
@@ -135,7 +135,7 @@ class View {
         if (DOMsOfSlider.DOMsSliderHandles) {
           (
             DOMsOfSlider.DOMsSliderHandles[index]
-              .DOMHandleValueText as HTMLElement
+              .DOMHandleValueText as HTMLDivElement
           ).innerHTML = `${handleObj.value}`;
         }
       });
@@ -145,12 +145,12 @@ class View {
   //Подписание рычажков на события перетаскивания.
   subscriptionHandleEvent = (
     DOMSliderHandle: IDOMsSliderHandles,
-    DOMSliderRoller: HTMLDivElement,
+    DOMsOfSlider: IDOMsOfSlider,
     modelData: IModelData
   ): void => {
     const handlerDragAndDrop: HandlerDragAndDrop = new HandlerDragAndDrop(
       DOMSliderHandle,
-      DOMSliderRoller,
+      DOMsOfSlider,
       modelData
     );
     handlerDragAndDrop.addEvent();

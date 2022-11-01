@@ -47,7 +47,7 @@ class Controller {
     this.DOMsSlider.DOMsSliderHandles = DOMsSliderHandles?.map(
       (handleDOMs): IDOMsSliderHandle => {
         return {
-          DOMHandleBody: handleDOMs[0],
+          DOMHandleContainer: handleDOMs[0],
           DOMHandleView: handleDOMs[1],
           DOMHandleValue: handleDOMs[2],
           DOMHandleValueText: handleDOMs[3],
@@ -59,7 +59,7 @@ class Controller {
       if (this.DOMsSlider.DOMSliderRoller)
         this.view.subscriptionHandleEvent(
           DOMsHandleObj,
-          this.DOMsSlider.DOMSliderRoller,
+          this.DOMsSlider,
           this.modelData
         );
     });

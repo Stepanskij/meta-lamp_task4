@@ -1,5 +1,5 @@
 interface IDOMsSliderHandle {
-  DOMHandleBody?: HTMLDivElement;
+  DOMHandleContainer?: HTMLDivElement;
   DOMHandleView?: HTMLDivElement;
   DOMHandleValue?: HTMLDivElement;
   DOMHandleValueText?: HTMLDivElement;

@@ -4,11 +4,11 @@ import IScaleData from "./IScaleData";
 interface IModelData {
   maxValue?: number;
   minValue?: number;
-  stepSize?: number;  
+  stepSize?: number;
   maxSteps?: number;
   handles?: IHandles[];
-  scaleData?:IScaleData;
+  handlesCanPushed?: boolean;
+  scaleData?: IScaleData;
 }
 
 export default IModelData;
-
