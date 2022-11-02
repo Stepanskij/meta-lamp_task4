@@ -122,23 +122,75 @@ class HandlerDragAndDrop {
           }
         }
       }
+
       //Невозможность выйти за границы ролика.
       if (stepNow < 0) {
         stepNow = 0;
       } else if (stepNow > this.modelData.maxSteps) {
         stepNow = this.modelData.maxSteps;
       }
-      //
+      //Смена позицыи данного рычажка.
       this.handleObj.step = stepNow;
       this.handleObj.value =
         this.modelData.minValue + stepNow * this.modelData.stepSize;
       const styleLeft = (stepNow / this.modelData.maxSteps) * 100;
       this._renderHandle(
-        this.DOMsOfSlider.DOMsSliderHandles[this.eventElementIndex]
-          .DOMHandleContainer as HTMLDivElement,
-        styleLeft
+        this.DOMsOfSlider.DOMsSliderHandles[
+          this.eventElementIndex
+        ] as IDOMsSliderHandle,
+        styleLeft,
+        this.handleObj.value
       );
-      this.DOMHandle.DOMHandleValueText.innerHTML = `${this.handleObj.value}`;
+      //Возможность толкать рычажки на своём пути.
+      if (this.modelData.handlesCanPushed && this.modelData.handles) {
+        //Объекты рычажков слева.
+        const handlesLeft = this.DOMsOfSlider.DOMsSliderHandles.slice(
+          0,
+          this.eventElementIndex
+        );
+        //Объекты рычажков справа.
+        const handlesRight = this.DOMsOfSlider.DOMsSliderHandles.slice(
+          this.eventElementIndex + 1
+        );
+        //Толкание рычажков слева.
+        if (handlesLeft.length > 0) {
+          handlesLeft.forEach((handleDOMsObj) => {
+            //Индекс проверяемого рычажка.
+            const indexHandle = Number(
+              handleDOMsObj.DOMHandleView?.dataset.index
+            );
+            //Проверяемый рычажок рычажка.
+            const stepHandle = (this.modelData.handles as IHandles[])[
+              indexHandle
+            ];
+            //Переделка проверяемого рычажка.
+            if ((stepHandle.step as number) > stepNow && this.handleObj) {
+              stepHandle.step = stepNow;
+              stepHandle.value = this.handleObj.value;
+              this._renderHandle(handleDOMsObj, styleLeft, stepHandle.value);
+            }
+          });
+        }
+        //Толкание рычажков справа.
+        if (handlesRight.length > 0) {
+          handlesRight.forEach((handleDOMsObj) => {
+            //Индекс проверяемого рычажка.
+            const indexHandle = Number(
+              handleDOMsObj.DOMHandleView?.dataset.index
+            );
+            //Проверяемый рычажок рычажка.
+            const stepHandle = (this.modelData.handles as IHandles[])[
+              indexHandle
+            ];
+            //Переделка проверяемого рычажка.
+            if ((stepHandle.step as number) < stepNow && this.handleObj) {
+              stepHandle.step = stepNow;
+              stepHandle.value = this.handleObj.value;
+              this._renderHandle(handleDOMsObj, styleLeft, stepHandle.value);
+            }
+          });
+        }
+      }
     }
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка.
@@ -148,10 +200,14 @@ class HandlerDragAndDrop {
   };
   //Задаёт указанный сдвиг влево для рычажка.
   private _renderHandle = (
-    handleDOM: HTMLDivElement,
-    styleLeft: number
+    handleDOMs: IDOMsSliderHandle,
+    styleLeft: number,
+    valueNumber: number
   ): void => {
-    handleDOM.setAttribute("style", `left:${styleLeft}%`);
+    if (handleDOMs.DOMHandleContainer && handleDOMs.DOMHandleValueText) {
+      handleDOMs.DOMHandleContainer.setAttribute("style", `left:${styleLeft}%`);
+      handleDOMs.DOMHandleValueText.innerHTML = `${valueNumber}`;
+    }
   };
 
   private _getPositionElement = (

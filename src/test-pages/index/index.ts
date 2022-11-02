@@ -11,6 +11,7 @@ const userModelData: IModelData = {
   maxValue: 40,
   handles: [{ value: 0 }, { value: 20 }, { value: -20 }],
   scaleData: { customMarkArray: [], numberAutoMark: 3 },
+  handlesCanPushed: true,
 };
 
 const controller1 = new Controller(
