@@ -9,6 +9,7 @@ interface IModelData {
   handles?: IHandles[];
   handlesCanPushed?: boolean;
   scaleData?: IScaleData;
+  bordersFillStrips?: number[];
 }
 
 export default IModelData;

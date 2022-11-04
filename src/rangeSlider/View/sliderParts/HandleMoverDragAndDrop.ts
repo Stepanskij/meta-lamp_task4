@@ -3,7 +3,7 @@ import IHandles from "rangeSlider/Data/IHandles";
 import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 
-class HandlerDragAndDrop {
+class HandleMoverDragAndDrop {
   private rollerWidth: number = 0;
   private stepWidth: number = 0;
   private handleObj?: IHandles;
@@ -232,4 +232,4 @@ class HandlerDragAndDrop {
   };
 }
 
-export default HandlerDragAndDrop;
+export default HandleMoverDragAndDrop;

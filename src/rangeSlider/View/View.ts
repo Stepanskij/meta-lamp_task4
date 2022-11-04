@@ -1,5 +1,5 @@
 //импорт классов
-import HandlerDragAndDrop from "./sliderParts/handlerDragAndDrop";
+import HandleMoverDragAndDrop from "./sliderParts/HandleMoverDragAndDrop";
 //импорт интерфейсов
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
@@ -48,7 +48,12 @@ class View {
     DOMHandleValue.insertAdjacentElement("beforeend", DOMHandleValueText);
     DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleView);
     //
-    return [DOMHandleContainer, DOMHandleView, DOMHandleValue, DOMHandleValueText];
+    return [
+      DOMHandleContainer,
+      DOMHandleView,
+      DOMHandleValue,
+      DOMHandleValueText,
+    ];
   };
   //Создание метки шкалы масштаба.
   createScaleMarker = (DOMsOfSlider: IDOMsOfSlider): HTMLDivElement[] => {
@@ -82,9 +87,25 @@ class View {
       DOMScaleMarkValueText,
     ];
   };
+  //Создание полосы заполнения.
+  createFillStrip = (
+    DOMsOfSlider: IDOMsOfSlider,
+    rightBorders: number
+  ): HTMLDivElement => {
+    const DOMFillStrip = document.createElement("div");
+    DOMFillStrip.className = "range-slider__flip-scrip";
+    DOMFillStrip.dataset.rightBorders = `${rightBorders}`;
+    //
+    if (DOMsOfSlider.DOMSliderRoller)
+      DOMsOfSlider.DOMSliderRoller.insertAdjacentElement(
+        "beforeend",
+        DOMFillStrip
+      );
+    return DOMFillStrip;
+  };
   //Отрисовка элементов View по данным Model.
   renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
-    this.renderViewHandle(DOMsOfSlider, modelData);
+    this.renderViewHandles(DOMsOfSlider, modelData);
     this.renderViewScaleMarkers(DOMsOfSlider, modelData);
   };
   //Отрисовка положений маркеров на шкале масштаба.
@@ -114,7 +135,7 @@ class View {
     });
   };
   //Отрисовка положений рычажков.
-  renderViewHandle = (
+  renderViewHandles = (
     DOMsOfSlider: IDOMsOfSlider,
     modelData: IModelData
   ): void => {
@@ -127,7 +148,8 @@ class View {
       ) {
         const styleLeft = (handleObj.step / modelData.maxSteps) * 100;
         (
-          DOMsOfSlider.DOMsSliderHandles[index].DOMHandleContainer as HTMLDivElement
+          DOMsOfSlider.DOMsSliderHandles[index]
+            .DOMHandleContainer as HTMLDivElement
         ).setAttribute("style", `left:${styleLeft}%`);
       }
       //Перерисовка значений облачков над рычажками.
@@ -141,18 +163,15 @@ class View {
       });
     });
   };
-
+  renderFillStrips = (): void => {};
   //Подписание рычажков на события перетаскивания.
   subscriptionHandleEvent = (
     DOMSliderHandle: IDOMsSliderHandles,
     DOMsOfSlider: IDOMsOfSlider,
     modelData: IModelData
   ): void => {
-    const handlerDragAndDrop: HandlerDragAndDrop = new HandlerDragAndDrop(
-      DOMSliderHandle,
-      DOMsOfSlider,
-      modelData
-    );
+    const handlerDragAndDrop: HandleMoverDragAndDrop =
+      new HandleMoverDragAndDrop(DOMSliderHandle, DOMsOfSlider, modelData);
     handlerDragAndDrop.addEvent();
   };
 }

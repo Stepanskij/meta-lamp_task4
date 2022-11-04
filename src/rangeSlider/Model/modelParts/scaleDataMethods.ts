@@ -12,7 +12,10 @@ class scaleDataMethods {
   }
   //Исправляет значение кастомной метки, приравнивая значение к ближайшему возможному значению.
   fixedCustomMark = (): void => {
-    if (this.scaleData.customMarkArray) {
+    if (
+      this.scaleData.customMarkArray &&
+      this.scaleData.customMarkArray.length
+    ) {
       this.scaleData.customMarkArray = this.scaleData.customMarkArray.map(
         (markValue): number => {
           let fixValue = 0;

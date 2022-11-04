@@ -54,15 +54,6 @@ class Controller {
         };
       }
     );
-    //Подписывает каждый рычажок на событие DragAndDrop.
-    this.DOMsSlider.DOMsSliderHandles?.forEach((DOMsHandleObj) => {
-      if (this.DOMsSlider.DOMSliderRoller)
-        this.view.subscriptionHandleEvent(
-          DOMsHandleObj,
-          this.DOMsSlider,
-          this.modelData
-        );
-    });
     //Создаются элементы меток масштаба слайдера.
     const DOMsScaleMarks = this.modelData.scaleData?.markArray?.map(() => {
       return this.view.createScaleMarker(this.DOMsSlider);
@@ -78,6 +69,24 @@ class Controller {
         };
       }
     );
+    //Создание полосок заполнения рычажков.
+    if (this.modelData.bordersFillStrips) {
+      const DOMsFillStrips = this.modelData.bordersFillStrips.map(
+        (rightBorderStrip) => {
+          return this.view.createFillStrip(this.DOMsSlider, rightBorderStrip);
+        }
+      );
+      this.DOMsSlider.DOMsFillStrips = DOMsFillStrips;
+    }
+    //Подписывает каждый рычажок на событие DragAndDrop.
+    this.DOMsSlider.DOMsSliderHandles?.forEach((DOMsHandleObj) => {
+      if (this.DOMsSlider.DOMSliderRoller)
+        this.view.subscriptionHandleEvent(
+          DOMsHandleObj,
+          this.DOMsSlider,
+          this.modelData
+        );
+    });
   };
 }
 

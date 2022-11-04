@@ -7,6 +7,7 @@ interface IDOMsOfSlider {
   DOMsSliderHandles?: IDOMsSliderHandle[];
   DOMScaleContainer?: HTMLDivElement;
   DOMsScaleMarkers?: IDOMsScaleMark[];
+  DOMsFillStrips?: HTMLDivElement[];
 }
 
 export default IDOMsOfSlider;

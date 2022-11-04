@@ -16,6 +16,7 @@
   &__scale-container {
     position: absolute;
     display: flex;
+    left: -5px;
     top: 2.5px;
     width: 100%;
     height: min-content;
@@ -25,6 +26,7 @@
     &-container {
       position: absolute;
       display: flex;
+      align-items: center;
       flex-direction: column;
     }
     &-separator {
@@ -63,11 +65,12 @@
       border-radius: 5px;
       background-color: aquamarine;
       user-select: none;
+      z-index: 1;
     }
     &-value {
       position: absolute;
-      top: -6px;
       left: -5px;
+      top: -6px;
       max-width: 10px;
       width: 10px;
       height: 5px;
@@ -79,5 +82,11 @@
         justify-content: center;
       }
     }
+  }
+
+  &__flip-scrip {
+    position: absolute;
+    height: 1.5px;
+    background: linear-gradient(270deg, blue, pink);
   }
 }

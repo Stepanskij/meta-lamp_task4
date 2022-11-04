@@ -13,8 +13,7 @@ class Model {
     this.fixMaxValue(); //Исправляет максимальное значение.
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
     this._reconstructionHandlesArray(this.modelData.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
-
-    this.scaleDataMethods = new scaleDataMethods(this.modelData);
+    this.scaleDataMethods = new scaleDataMethods(this.modelData); //Записывает методы работы над свойстом scaleData объекта modelData.
   }
 
   //Создание массива рычажков при создании класса Model.
@@ -106,11 +105,11 @@ class Model {
           this.modelData.maxValue + this.modelData.stepSize - remainder;
     }
   };
-
+  //Получить ссылку на объект модели.
   getModelData = (): IModelData => {
     return this.modelData;
   };
-
+  //Задать значения свойствам модели, если те не были переданы User-ом.
   private _makeDefaultModelValues = (): void => {
     const modelData = this.modelData;
     if (modelData.minValue === undefined) modelData.minValue = -10;
@@ -119,12 +118,15 @@ class Model {
     if (modelData.handles === undefined) modelData.handles = [{ value: 0 }];
     if (modelData.handlesCanPushed === undefined)
       modelData.handlesCanPushed = false;
-    if (modelData.scaleData !== undefined) {
+    if (modelData.scaleData === undefined) {
+      modelData.scaleData = {};
       if (modelData.scaleData.customMarkArray === undefined)
         modelData.scaleData.customMarkArray = [];
       if (modelData.scaleData.numberAutoMark === undefined)
         modelData.scaleData.numberAutoMark = 0;
     }
+    if (modelData.bordersFillStrips === undefined)
+      modelData.bordersFillStrips = [0];
   };
 }
 

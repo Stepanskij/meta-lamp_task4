@@ -14,9 +14,6 @@ const userModelData: IModelData = {
   handlesCanPushed: true,
 };
 
-const controller1 = new Controller(
-  DOMTestSlider1 as HTMLDivElement,
-  userModelData
-);
+const controller1 = new Controller(DOMTestSlider1 as HTMLDivElement);
 
 export {};
