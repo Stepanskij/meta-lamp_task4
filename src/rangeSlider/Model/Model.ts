@@ -12,6 +12,7 @@ class Model {
     this._makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
     this.fixMaxValue(); //Исправляет максимальное значение.
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
+    this.sortBordersFillStrips();
     this._reconstructionHandlesArray(this.modelData.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
     this.scaleDataMethods = new scaleDataMethods(this.modelData); //Записывает методы работы над свойстом scaleData объекта modelData.
   }
@@ -25,7 +26,6 @@ class Model {
       this.addHandle(handleObj.value);
     });
   };
-
   //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
   addHandle = (value?: number): void => {
     if (
@@ -75,7 +75,6 @@ class Model {
   removeHandle = (): void => {
     this.modelData.handles?.pop();
   };
-
   //Расчёт количества шагов (делений) слайдера.
   getMaxSteps = (): void => {
     if (
@@ -89,7 +88,6 @@ class Model {
       );
     }
   };
-
   //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
   fixMaxValue = (): void => {
     if (
@@ -103,6 +101,32 @@ class Model {
       if (remainder)
         this.modelData.maxValue =
           this.modelData.maxValue + this.modelData.stepSize - remainder;
+    }
+  };
+  //Сортировать массив bordersFillStrips на некорректные значения.
+  sortBordersFillStrips = (): void => {
+    if (this.modelData.bordersFillStrips) {
+      //Округляем выходящие за пределы ролика значения.
+      this.modelData.bordersFillStrips = this.modelData.bordersFillStrips.map(
+        (number): number => {
+          let leftBorder = number;
+          if (leftBorder > (this.modelData.handles as IHandles[]).length)
+            leftBorder = (this.modelData.handles as IHandles[]).length;
+          if (leftBorder < 0) leftBorder = 0;
+          return leftBorder;
+        }
+      );
+      //Выкидываем из массива повторяющиеся элементы.
+      this.modelData.bordersFillStrips =
+        this.modelData.bordersFillStrips.filter((number, index, array) => {
+          return array.indexOf(number) === index;
+        });
+      //сортировка по возростанию.
+      this.modelData.bordersFillStrips = this.modelData.bordersFillStrips.sort(
+        (a, b) => {
+          return a - b;
+        }
+      );
     }
   };
   //Получить ссылку на объект модели.

@@ -12,8 +12,12 @@ const userModelData: IModelData = {
   handles: [{ value: 0 }, { value: 20 }, { value: -20 }],
   scaleData: { customMarkArray: [], numberAutoMark: 3 },
   handlesCanPushed: true,
+  bordersFillStrips: [1,8,0,-9, 2, 3, 4, 5],
 };
 
-const controller1 = new Controller(DOMTestSlider1 as HTMLDivElement);
+const controller1 = new Controller(
+  DOMTestSlider1 as HTMLDivElement,
+  userModelData
+);
 
 export {};

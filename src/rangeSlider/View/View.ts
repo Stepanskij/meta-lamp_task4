@@ -1,5 +1,5 @@
 //импорт классов
-import HandleMoverDragAndDrop from "./sliderParts/HandleMoverDragAndDrop";
+import HandleMoverDragAndDrop from "./viewParts/HandleMoverDragAndDrop";
 //импорт интерфейсов
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
@@ -90,11 +90,11 @@ class View {
   //Создание полосы заполнения.
   createFillStrip = (
     DOMsOfSlider: IDOMsOfSlider,
-    rightBorders: number
+    leftBorderNumber: number
   ): HTMLDivElement => {
     const DOMFillStrip = document.createElement("div");
     DOMFillStrip.className = "range-slider__flip-scrip";
-    DOMFillStrip.dataset.rightBorders = `${rightBorders}`;
+    DOMFillStrip.dataset.leftBorderNumber = `${leftBorderNumber}`;
     //
     if (DOMsOfSlider.DOMSliderRoller)
       DOMsOfSlider.DOMSliderRoller.insertAdjacentElement(
@@ -107,6 +107,7 @@ class View {
   renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
     this.renderViewHandles(DOMsOfSlider, modelData);
     this.renderViewScaleMarkers(DOMsOfSlider, modelData);
+    this.renderFillStrips(DOMsOfSlider);
   };
   //Отрисовка положений маркеров на шкале масштаба.
   renderViewScaleMarkers = (
@@ -163,7 +164,41 @@ class View {
       });
     });
   };
-  renderFillStrips = (): void => {};
+  renderFillStrips = (DOMsOfSlider: IDOMsOfSlider): void => {
+    DOMsOfSlider.DOMsFillStrips?.forEach((DOMFillStrip) => {
+      if (DOMsOfSlider.DOMsSliderHandles) {
+        const leftBorderNumber = Number(DOMFillStrip.dataset.leftBorderNumber);
+        let styleLeftBorder = 0;
+        let styleRightBorder = 100;
+        //Находим отступ левой границы от левого края ролика, %.
+        if (leftBorderNumber > 0) {
+          styleLeftBorder = Number(
+            DOMsOfSlider.DOMsSliderHandles[
+              leftBorderNumber - 1
+            ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
+          );
+        }
+        //Находим отступ правой границы от левого края ролика, %.
+        if (
+          leftBorderNumber <
+          (DOMsOfSlider.DOMsSliderHandles as IDOMsSliderHandles[]).length
+        ) {
+          styleRightBorder = Number(
+            DOMsOfSlider.DOMsSliderHandles[
+              leftBorderNumber
+            ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
+          );
+        }
+        //
+        const styleLeft = styleLeftBorder;
+        const styleWidth = styleRightBorder - styleLeftBorder;
+        DOMFillStrip.setAttribute(
+          "style",
+          `width:${styleWidth}%; left:${styleLeft}%`
+        );
+      }
+    });
+  };
   //Подписание рычажков на события перетаскивания.
   subscriptionHandleEvent = (
     DOMSliderHandle: IDOMsSliderHandles,
