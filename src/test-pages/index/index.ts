@@ -7,12 +7,13 @@ const DOMTestSlider1: HTMLDivElement | null =
   document.querySelector(".test-div-1");
 
 const userModelData: IModelData = {
-  stepSize: 3,
+  stepSize: 3.017,
   maxValue: 40,
+  minValue: -12,
   handles: [{ value: 0 }, { value: 20 }, { value: -20 }],
-  scaleData: { customMarkArray: [], numberAutoMark: 3 },
+  scaleData: { customMarkArray: [10,-12], numberAutoMark: 3 },
   handlesCanPushed: true,
-  bordersFillStrips: [1,8,0,-9, 2, 3, 4, 5],
+  bordersFillStrips: [1],
 };
 
 const controller1 = new Controller(

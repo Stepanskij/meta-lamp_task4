@@ -2,6 +2,7 @@ import IHandles from "./IHandles";
 import IScaleData from "./IScaleData";
 
 interface IModelData {
+  numberRounding?: number;
   maxValue?: number;
   minValue?: number;
   stepSize?: number;

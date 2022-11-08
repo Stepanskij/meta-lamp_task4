@@ -1,5 +1,5 @@
 //импорт классов
-import HandleMoverDragAndDrop from "./viewParts/HandleMoverDragAndDrop";
+import HandleDragAndDrop from "./viewParts/HandleDragAndDrop";
 //импорт интерфейсов
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import IModelData from "rangeSlider/Data/IModelData";
@@ -203,10 +203,15 @@ class View {
   subscriptionHandleEvent = (
     DOMSliderHandle: IDOMsSliderHandles,
     DOMsOfSlider: IDOMsOfSlider,
-    modelData: IModelData
+    modelData: IModelData,
+    viewMethods: View
   ): void => {
-    const handlerDragAndDrop: HandleMoverDragAndDrop =
-      new HandleMoverDragAndDrop(DOMSliderHandle, DOMsOfSlider, modelData);
+    const handlerDragAndDrop: HandleDragAndDrop = new HandleDragAndDrop(
+      DOMSliderHandle,
+      DOMsOfSlider,
+      modelData,
+      viewMethods
+    );
     handlerDragAndDrop.addEvent();
   };
 }

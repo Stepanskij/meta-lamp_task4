@@ -84,7 +84,8 @@ class Controller {
         this.view.subscriptionHandleEvent(
           DOMsHandleObj,
           this.DOMsSlider,
-          this.modelData
+          this.modelData,
+          this.view
         );
     });
   };

@@ -118,6 +118,16 @@ class scaleDataMethods {
       this.scaleData.markArray = autoMarkArray.concat(
         this.scaleData.customMarkArray
       );
+      //Выкидывание, выхдящих за пределы ролика, значений.
+      this.scaleData.markArray = this.scaleData.markArray.filter((number) => {
+        return (
+          this.modelData.maxValue &&
+          this.modelData.minValue &&
+          !(
+            number > this.modelData.maxValue || number < this.modelData.minValue
+          )
+        );
+      });
       //Выкидываем из массива повторяющиеся элементы.
       this.scaleData.markArray = this.scaleData.markArray.filter(
         (number, index, array) => {
@@ -127,6 +137,10 @@ class scaleDataMethods {
       //Сортировка значений по возростанию.
       this.scaleData.markArray.sort((a, b) => {
         return a - b;
+      });
+      //Округление значений.
+      this.scaleData.markArray = this.scaleData.markArray.map((number) => {
+        return Number(number.toFixed(this.modelData.numberRounding));
       });
     }
   };

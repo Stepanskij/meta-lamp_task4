@@ -2,8 +2,9 @@ import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
 import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
 import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
+import View from "../View";
 
-class HandleMoverDragAndDrop {
+class HandleDragAndDrop {
   private rollerWidth: number = 0;
   private stepWidth: number = 0;
   private handleObj?: IHandles;
@@ -13,7 +14,8 @@ class HandleMoverDragAndDrop {
   constructor(
     private DOMHandle: IDOMsSliderHandle,
     private DOMsOfSlider: IDOMsOfSlider,
-    private modelData: IModelData
+    private modelData: IModelData,
+    private viewMethods: View
   ) {}
 
   addEvent = (): void => {
@@ -90,8 +92,7 @@ class HandleMoverDragAndDrop {
       this.modelData.minValue &&
       this.modelData.stepSize &&
       this.handleObj &&
-      this.DOMsOfSlider.DOMsSliderHandles &&
-      this.DOMHandle.DOMHandleValueText
+      this.DOMsOfSlider.DOMsSliderHandles
     ) {
       //Невозможность перескочить соседние рычажки.
       if (!this.modelData.handlesCanPushed && this.modelData.handles) {
@@ -129,17 +130,12 @@ class HandleMoverDragAndDrop {
       } else if (stepNow > this.modelData.maxSteps) {
         stepNow = this.modelData.maxSteps;
       }
-      //Смена позицыи данного рычажка.
+      //Смена позиции данного рычажка.
       this.handleObj.step = stepNow;
-      this.handleObj.value =
-        this.modelData.minValue + stepNow * this.modelData.stepSize;
-      const styleLeft = (stepNow / this.modelData.maxSteps) * 100;
-      this._renderHandle(
-        this.DOMsOfSlider.DOMsSliderHandles[
-          this.eventElementIndex
-        ] as IDOMsSliderHandle,
-        styleLeft,
-        this.handleObj.value
+      this.handleObj.value = Number(
+        (this.modelData.minValue + stepNow * this.modelData.stepSize).toFixed(
+          this.modelData.numberRounding
+        )
       );
       //Возможность толкать рычажки на своём пути.
       if (this.modelData.handlesCanPushed && this.modelData.handles) {
@@ -159,7 +155,6 @@ class HandleMoverDragAndDrop {
             const indexHandle = Number(
               handleDOMsObj.DOMHandleView?.dataset.index
             );
-            //Проверяемый рычажок рычажка.
             const stepHandle = (this.modelData.handles as IHandles[])[
               indexHandle
             ];
@@ -167,7 +162,6 @@ class HandleMoverDragAndDrop {
             if ((stepHandle.step as number) > stepNow && this.handleObj) {
               stepHandle.step = stepNow;
               stepHandle.value = this.handleObj.value;
-              this._renderHandle(handleDOMsObj, styleLeft, stepHandle.value);
             }
           });
         }
@@ -178,7 +172,6 @@ class HandleMoverDragAndDrop {
             const indexHandle = Number(
               handleDOMsObj.DOMHandleView?.dataset.index
             );
-            //Проверяемый рычажок рычажка.
             const stepHandle = (this.modelData.handles as IHandles[])[
               indexHandle
             ];
@@ -186,28 +179,18 @@ class HandleMoverDragAndDrop {
             if ((stepHandle.step as number) < stepNow && this.handleObj) {
               stepHandle.step = stepNow;
               stepHandle.value = this.handleObj.value;
-              this._renderHandle(handleDOMsObj, styleLeft, stepHandle.value);
             }
           });
         }
       }
+      this.viewMethods.renderViewHandles(this.DOMsOfSlider, this.modelData);
+      this.viewMethods.renderFillStrips(this.DOMsOfSlider);
     }
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка.
   private _handleMouseUp = (): void => {
     document.removeEventListener("mousemove", this._handleMouseMove);
     document.removeEventListener("mouseup", this._handleMouseUp);
-  };
-  //Задаёт указанный сдвиг влево для рычажка.
-  private _renderHandle = (
-    handleDOMs: IDOMsSliderHandle,
-    styleLeft: number,
-    valueNumber: number
-  ): void => {
-    if (handleDOMs.DOMHandleContainer && handleDOMs.DOMHandleValueText) {
-      handleDOMs.DOMHandleContainer.setAttribute("style", `left:${styleLeft}%`);
-      handleDOMs.DOMHandleValueText.innerHTML = `${valueNumber}`;
-    }
   };
 
   private _getPositionElement = (
@@ -232,4 +215,4 @@ class HandleMoverDragAndDrop {
   };
 }
 
-export default HandleMoverDragAndDrop;
+export default HandleDragAndDrop;

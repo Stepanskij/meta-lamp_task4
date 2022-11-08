@@ -5,18 +5,18 @@ import scaleDataMethods from "./modelParts/scaleDataMethods";
 
 class Model {
   private modelData: IModelData = {};
-  private scaleDataMethods: scaleDataMethods;
+  public scaleDataMethods: scaleDataMethods;
 
   constructor(modelData?: IModelData) {
     if (modelData) this.modelData = modelData;
     this._makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
+    this.getNumberRounding();
     this.fixMaxValue(); //Исправляет максимальное значение.
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
     this.sortBordersFillStrips();
     this._reconstructionHandlesArray(this.modelData.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
     this.scaleDataMethods = new scaleDataMethods(this.modelData); //Записывает методы работы над свойстом scaleData объекта modelData.
   }
-
   //Создание массива рычажков при создании класса Model.
   private _reconstructionHandlesArray = (handlesArray: IHandles[]): void => {
     const handles = handlesArray;
@@ -47,9 +47,14 @@ class Model {
           correctStep =
             Math.abs(value - this.modelData.minValue) / this.modelData.stepSize;
         }
+
         correctStep = Math.round(correctStep);
-        let correctValue =
-          this.modelData.minValue + correctStep * this.modelData.stepSize;
+        let correctValue = Number(
+          (
+            this.modelData.minValue +
+            correctStep * this.modelData.stepSize
+          ).toFixed(this.modelData.numberRounding)
+        );
         //Помещение рычажка (объекта с данными) в массив.
         this.modelData.handles?.push({
           value: correctValue,
@@ -88,6 +93,26 @@ class Model {
       );
     }
   };
+  //Расчёт количества цифр после запятой.
+  getNumberRounding = (): void => {
+    if (
+      this.modelData.maxValue !== undefined &&
+      this.modelData.minValue !== undefined &&
+      this.modelData.stepSize !== undefined
+    ) {
+      let stepSizeRemainder = String(this.modelData.stepSize).split(".")[1];
+      let minValueRemainder = String(this.modelData.minValue).split(".")[1];
+      let maxValueRemainder = String(this.modelData.maxValue).split(".")[1];
+      if (stepSizeRemainder === undefined) stepSizeRemainder = "";
+      if (minValueRemainder === undefined) minValueRemainder = "";
+      if (maxValueRemainder === undefined) maxValueRemainder = "";
+      this.modelData.numberRounding = Math.max(
+        stepSizeRemainder.length,
+        minValueRemainder.length,
+        maxValueRemainder.length
+      );
+    }
+  };
   //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
   fixMaxValue = (): void => {
     if (
@@ -99,8 +124,13 @@ class Model {
         (this.modelData.maxValue - this.modelData.minValue) %
         this.modelData.stepSize;
       if (remainder)
-        this.modelData.maxValue =
-          this.modelData.maxValue + this.modelData.stepSize - remainder;
+        this.modelData.maxValue = Number(
+          (
+            this.modelData.maxValue +
+            this.modelData.stepSize -
+            remainder
+          ).toFixed(this.modelData.numberRounding)
+        );
     }
   };
   //Сортировать массив bordersFillStrips на некорректные значения.
@@ -151,6 +181,7 @@ class Model {
     }
     if (modelData.bordersFillStrips === undefined)
       modelData.bordersFillStrips = [0];
+    if (modelData.numberRounding === undefined) modelData.numberRounding = 0;
   };
 }
 
