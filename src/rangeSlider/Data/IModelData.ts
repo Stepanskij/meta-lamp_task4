@@ -9,6 +9,7 @@ interface IModelData {
   maxSteps?: number;
   handles?: IHandles[];
   handlesCanPushed?: boolean;
+  isVertical?: boolean;
   scaleData?: IScaleData;
   bordersFillStrips?: number[];
 }

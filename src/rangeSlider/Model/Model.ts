@@ -172,6 +172,7 @@ class Model {
     if (modelData.handles === undefined) modelData.handles = [{ value: 0 }];
     if (modelData.handlesCanPushed === undefined)
       modelData.handlesCanPushed = false;
+    if (modelData.isVertical === undefined) modelData.isVertical = false;
     if (modelData.scaleData === undefined) {
       modelData.scaleData = {};
       if (modelData.scaleData.customMarkArray === undefined)

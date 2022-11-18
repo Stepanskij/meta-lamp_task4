@@ -6,9 +6,12 @@ import View from "../View";
 
 class HandleDragAndDrop {
   private rollerWidth: number = 0;
+  private rollerHeight: number = 0;
   private stepWidth: number = 0;
+  private stepHeight: number = 0;
   private handleObj?: IHandles;
   private rollerPageX: number = 0;
+  private rollerPageY: number = 0;
   private eventElementIndex: number = 0;
 
   constructor(
@@ -63,12 +66,19 @@ class HandleDragAndDrop {
       this.rollerWidth =
         this.DOMsOfSlider.DOMSliderRoller.offsetWidth -
         this.DOMsOfSlider.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
+      this.rollerHeight =
+        this.DOMsOfSlider.DOMSliderRoller.offsetHeight -
+        this.DOMsOfSlider.DOMSliderRoller.clientTop * 2; //Высота ролика при клике, px.
       this.stepWidth = this.rollerWidth / this.modelData.maxSteps; //Ширина одного шага рычажка, px.
+      this.stepHeight = this.rollerHeight / this.modelData.maxSteps; //Ширина одного шага рычажка, px.
       this.handleObj = this.modelData.handles[this.eventElementIndex]; //Data-объект рычажка.
 
       this.rollerPageX = this._getPositionElement(
         this.DOMsOfSlider.DOMSliderRoller
       ).left; //Левый отступ ролика относительно страницы.
+      this.rollerPageY = this._getPositionElement(
+        this.DOMsOfSlider.DOMSliderRoller
+      ).top; //Верхний отступ ролика относительно страницы.
     }
     //
     document.addEventListener("mousemove", this._handleMouseMove);
@@ -78,15 +88,25 @@ class HandleDragAndDrop {
   };
   private _handleMouseMove = (eventMove: UIEvent): void => {
     let pageX: number = 0;
+    let pageY: number = 0;
     if (eventMove instanceof TouchEvent) {
       pageX = eventMove.changedTouches[0].pageX;
+      pageY = eventMove.changedTouches[0].pageY;
     } else if (eventMove instanceof MouseEvent) {
       pageX = eventMove.pageX;
+      pageY = eventMove.pageY;
     }
 
     const rightShiftX = pageX - this.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
+    const rightShiftY = pageY - this.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
 
-    let stepNow = Math.round(rightShiftX / this.stepWidth);
+    let stepNow: number = 0;
+    if (!this.modelData.isVertical) {
+      stepNow = Math.round(rightShiftX / this.stepWidth);
+    } else if (this.modelData.maxSteps)
+      stepNow =
+        this.modelData.maxSteps - Math.round(rightShiftY / this.stepHeight);
+
     if (
       this.modelData.maxSteps &&
       this.modelData.minValue &&

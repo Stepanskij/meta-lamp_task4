@@ -21,9 +21,9 @@ class Controller {
     if (userModelData) {
       this.model = new Model(userModelData);
     } else this.model = new Model();
-    this.view = new View();
 
     this.modelData = this.model.getModelData();
+    this.view = new View(this.modelData);
     this.makeSlider();
     this.view.renderView(this.DOMsSlider, this.modelData);
   }

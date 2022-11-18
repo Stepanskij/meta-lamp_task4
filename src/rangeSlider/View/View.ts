@@ -6,12 +6,14 @@ import IModelData from "rangeSlider/Data/IModelData";
 import IDOMsSliderHandles from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
 
 class View {
-  constructor() {}
+  constructor(private modelData: IModelData) {}
 
   //Создание HTML-элементов, что не могут измениться.
   createBaseElements = (DOMDiv: HTMLDivElement): HTMLDivElement[] => {
     const DOMRangeSlider = document.createElement("div");
     DOMRangeSlider.className = "range-slider";
+    if (this.modelData.isVertical)
+      DOMRangeSlider.classList.add("range-slider_vertical");
     //
     const DOMSliderRoller = document.createElement("div");
     DOMSliderRoller.className = "range-slider__slider-roller";
@@ -128,10 +130,17 @@ class View {
           ((modelData.scaleData.markArray[index] - modelData.minValue) /
             (modelData.maxValue - modelData.minValue)) *
           100;
-        DOMsScaleMarker.DOMScaleMarkContainer.setAttribute(
-          "style",
-          `left:${styleLeft}%`
-        );
+        if (!this.modelData.isVertical) {
+          DOMsScaleMarker.DOMScaleMarkContainer.setAttribute(
+            "style",
+            `left:${styleLeft}%`
+          );
+        } else {
+          DOMsScaleMarker.DOMScaleMarkContainer.setAttribute(
+            "style",
+            `bottom:${styleLeft}%`
+          );
+        }
       }
     });
   };
@@ -148,10 +157,17 @@ class View {
         DOMsOfSlider.DOMsSliderHandles !== undefined
       ) {
         const styleLeft = (handleObj.step / modelData.maxSteps) * 100;
-        (
-          DOMsOfSlider.DOMsSliderHandles[index]
-            .DOMHandleContainer as HTMLDivElement
-        ).setAttribute("style", `left:${styleLeft}%`);
+        if (!this.modelData.isVertical) {
+          (
+            DOMsOfSlider.DOMsSliderHandles[index]
+              .DOMHandleContainer as HTMLDivElement
+          ).setAttribute("style", `left:${styleLeft}%`);
+        } else {
+          (
+            DOMsOfSlider.DOMsSliderHandles[index]
+              .DOMHandleContainer as HTMLDivElement
+          ).setAttribute("style", `bottom:${styleLeft}%`);
+        }
       }
       //Перерисовка значений облачков над рычажками.
       modelData.handles?.forEach((handleObj, index) => {
@@ -172,30 +188,53 @@ class View {
         let styleRightBorder = 100;
         //Находим отступ левой границы от левого края ролика, %.
         if (leftBorderNumber > 0) {
-          styleLeftBorder = Number(
-            DOMsOfSlider.DOMsSliderHandles[
-              leftBorderNumber - 1
-            ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
-          );
+          if (!this.modelData.isVertical) {
+            styleLeftBorder = Number(
+              DOMsOfSlider.DOMsSliderHandles[
+                leftBorderNumber - 1
+              ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
+            );
+          } else {
+            styleLeftBorder = Number(
+              DOMsOfSlider.DOMsSliderHandles[
+                leftBorderNumber - 1
+              ].DOMHandleContainer?.style.bottom.replace(/[%]/g, "")
+            );
+          }
         }
         //Находим отступ правой границы от левого края ролика, %.
         if (
           leftBorderNumber <
           (DOMsOfSlider.DOMsSliderHandles as IDOMsSliderHandles[]).length
         ) {
-          styleRightBorder = Number(
-            DOMsOfSlider.DOMsSliderHandles[
-              leftBorderNumber
-            ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
-          );
+          if (!this.modelData.isVertical) {
+            styleRightBorder = Number(
+              DOMsOfSlider.DOMsSliderHandles[
+                leftBorderNumber
+              ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
+            );
+          } else {
+            styleRightBorder = Number(
+              DOMsOfSlider.DOMsSliderHandles[
+                leftBorderNumber
+              ].DOMHandleContainer?.style.bottom.replace(/[%]/g, "")
+            );
+          }
         }
         //
         const styleLeft = styleLeftBorder;
         const styleWidth = styleRightBorder - styleLeftBorder;
-        DOMFillStrip.setAttribute(
-          "style",
-          `width:${styleWidth}%; left:${styleLeft}%`
-        );
+        if (!this.modelData.isVertical) {
+          DOMFillStrip.setAttribute(
+            "style",
+            `width:${styleWidth}%; left:${styleLeft}%`
+          );
+        } else {
+          DOMFillStrip.setAttribute(
+            "style",
+            `height:${styleWidth}%; bottom:${styleLeft}%`
+          );
+        }
       }
     });
   };
