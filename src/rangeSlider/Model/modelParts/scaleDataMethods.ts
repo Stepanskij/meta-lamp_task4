@@ -5,10 +5,7 @@ class scaleDataMethods {
   private scaleData: IScaleData;
 
   constructor(private modelData: IModelData) {
-    this.scaleData = this.modelData.scaleData as IScaleData;
-    this.fixedCustomMark();
-    this.fixedNumberAutoMark();
-    this.makeMarkArray();
+    this.scaleData = this.modelData.scaleData as IScaleData;    
   }
   //Исправляет значение кастомной метки, приравнивая значение к ближайшему возможному значению.
   fixedCustomMark = (): void => {
@@ -44,7 +41,7 @@ class scaleDataMethods {
     }
   };
   //Создание массива меток, исходя из числа автоматически создоваемых меток.
-  private _makeAutoMarkArray = (numberAutoMark: number): number[] => {
+  private makeAutoMarkArray = (numberAutoMark: number): number[] => {
     let markArray: number[] = [];
     if (
       this.modelData.minValue &&
@@ -110,7 +107,7 @@ class scaleDataMethods {
   };
 
   makeMarkArray = (): void => {
-    const autoMarkArray = this._makeAutoMarkArray(
+    const autoMarkArray = this.makeAutoMarkArray(
       this.scaleData.numberAutoMark as number
     );
     if (this.scaleData.customMarkArray) {

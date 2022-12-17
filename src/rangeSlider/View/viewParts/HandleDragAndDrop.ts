@@ -1,52 +1,48 @@
-import IModelData from "rangeSlider/Data/IModelData";
-import IHandles from "rangeSlider/Data/IHandles";
-import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
-import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
 import View from "../View";
+import EventArgs from "rangeSlider/Event/EventArgs";
+
+import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
+import IHandleMouseMove from "rangeSlider/Data/IHandleMouseMove";
 
 class HandleDragAndDrop {
-  private rollerWidth: number = 0;
-  private rollerHeight: number = 0;
-  private stepWidth: number = 0;
-  private stepHeight: number = 0;
-  private handleObj?: IHandles;
-  private rollerPageX: number = 0;
-  private rollerPageY: number = 0;
-  private eventElementIndex: number = 0;
+  private mouseMoveArgs: IHandleMouseMove = {
+    rollerWidth: 0,
+    rollerHeight: 0,
+    rollerPageX: 0,
+    rollerPageY: 0,
+    eventElementIndex: 0,
+    rightShiftX: 0,
+    upShiftY: 0,
+  };
 
-  constructor(
-    private DOMHandle: IDOMsSliderHandle,
-    private DOMsOfSlider: IDOMsOfSlider,
-    private modelData: IModelData,
-    private viewMethods: View
-  ) {}
+  constructor(public view: View) {}
 
-  addEvent = (): void => {
-    if (this.DOMHandle.DOMHandleView) {
-      this.DOMHandle.DOMHandleView.addEventListener(
+  addEvent = (DOMsHandle: IDOMsSliderHandle): void => {
+    if (DOMsHandle.DOMHandleView) {
+      DOMsHandle.DOMHandleView.addEventListener(
         "mousedown",
-        this._handleMouseDown
+        this.handleMouseDown
       );
-      this.DOMHandle.DOMHandleView.addEventListener(
+      DOMsHandle.DOMHandleView.addEventListener(
         "touchstart",
-        this._handleMouseDown
+        this.handleMouseDown
       );
     }
   };
-  removeEvent = (): void => {
-    if (this.DOMHandle.DOMHandleView) {
-      this.DOMHandle.DOMHandleView.removeEventListener(
+  removeEvent = (DOMsHandle: IDOMsSliderHandle): void => {
+    if (DOMsHandle.DOMHandleView) {
+      DOMsHandle.DOMHandleView.removeEventListener(
         "mousedown",
-        this._handleMouseDown
+        this.handleMouseDown
       );
-      this.DOMHandle.DOMHandleView.removeEventListener(
+      DOMsHandle.DOMHandleView.removeEventListener(
         "touchstart",
-        this._handleMouseDown
+        this.handleMouseDown
       );
     }
   };
 
-  private _handleMouseDown = (eventDown: UIEvent): void => {
+  private handleMouseDown = (eventDown: UIEvent): void => {
     //Запоминаем объект event.
     let eventClick;
     if (eventDown instanceof TouchEvent) {
@@ -54,39 +50,34 @@ class HandleDragAndDrop {
     } else if (eventDown instanceof MouseEvent) {
       eventClick = eventDown;
     }
+    //Обнуление сдвигов при клике на рычажок.
+    this.mouseMoveArgs.rightShiftX = 0;
+    this.mouseMoveArgs.upShiftY = 0;
     //Запоминание неизменных свойств при клике на рычажок.
-    if (
-      eventClick &&
-      this.modelData.handles &&
-      this.modelData.maxSteps &&
-      this.DOMsOfSlider.DOMSliderRoller
-    ) {
+    if (eventClick && this.view.data.DOMSliderRoller) {
       const eventElement = eventClick.target as HTMLDivElement; //view-элемент рычажка.
-      this.eventElementIndex = Number(eventElement.dataset.index);
-      this.rollerWidth =
-        this.DOMsOfSlider.DOMSliderRoller.offsetWidth -
-        this.DOMsOfSlider.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
-      this.rollerHeight =
-        this.DOMsOfSlider.DOMSliderRoller.offsetHeight -
-        this.DOMsOfSlider.DOMSliderRoller.clientTop * 2; //Высота ролика при клике, px.
-      this.stepWidth = this.rollerWidth / this.modelData.maxSteps; //Ширина одного шага рычажка, px.
-      this.stepHeight = this.rollerHeight / this.modelData.maxSteps; //Ширина одного шага рычажка, px.
-      this.handleObj = this.modelData.handles[this.eventElementIndex]; //Data-объект рычажка.
+      this.mouseMoveArgs.eventElementIndex = Number(eventElement.dataset.index); //Получение индекса рычажка.
+      this.mouseMoveArgs.rollerWidth =
+        this.view.data.DOMSliderRoller.offsetWidth -
+        this.view.data.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
+      this.mouseMoveArgs.rollerHeight =
+        this.view.data.DOMSliderRoller.offsetHeight -
+        this.view.data.DOMSliderRoller.clientTop * 2; //Высота ролика при клике, px.
 
-      this.rollerPageX = this._getPositionElement(
-        this.DOMsOfSlider.DOMSliderRoller
+      this.mouseMoveArgs.rollerPageX = this.getPositionElement(
+        this.view.data.DOMSliderRoller
       ).left; //Левый отступ ролика относительно страницы.
-      this.rollerPageY = this._getPositionElement(
-        this.DOMsOfSlider.DOMSliderRoller
+      this.mouseMoveArgs.rollerPageY = this.getPositionElement(
+        this.view.data.DOMSliderRoller
       ).top; //Верхний отступ ролика относительно страницы.
     }
     //
-    document.addEventListener("mousemove", this._handleMouseMove);
-    document.addEventListener("touchmove", this._handleMouseMove);
-    document.addEventListener("mouseup", this._handleMouseUp);
-    document.addEventListener("touchend", this._handleMouseUp);
+    document.addEventListener("mousemove", this.handleMouseMove);
+    document.addEventListener("touchmove", this.handleMouseMove);
+    document.addEventListener("mouseup", this.handleMouseUp);
+    document.addEventListener("touchend", this.handleMouseUp);
   };
-  private _handleMouseMove = (eventMove: UIEvent): void => {
+  private handleMouseMove = (eventMove: UIEvent): void => {
     let pageX: number = 0;
     let pageY: number = 0;
     if (eventMove instanceof TouchEvent) {
@@ -97,135 +88,30 @@ class HandleDragAndDrop {
       pageY = eventMove.pageY;
     }
 
-    const rightShiftX = pageX - this.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
-    const rightShiftY = pageY - this.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
-
-    let stepNow: number = 0;
-    if (!this.modelData.isVertical) {
-      stepNow = Math.round(rightShiftX / this.stepWidth);
-    } else if (this.modelData.maxSteps)
-      stepNow =
-        this.modelData.maxSteps - Math.round(rightShiftY / this.stepHeight);
-
-    if (
-      this.modelData.maxSteps &&
-      this.modelData.minValue &&
-      this.modelData.stepSize &&
-      this.handleObj &&
-      this.DOMsOfSlider.DOMsSliderHandles
-    ) {
-      //Невозможность перескочить соседние рычажки.
-      if (!this.modelData.handlesCanPushed && this.modelData.handles) {
-        //Невозможность перескочить правый рычажок.
-        if (
-          this.eventElementIndex < this.modelData.handles.length - 1 &&
-          this.modelData.handles[this.eventElementIndex + 1].step !== undefined
-        ) {
-          if (
-            stepNow >
-            (this.modelData.handles[this.eventElementIndex + 1].step as number)
-          ) {
-            stepNow = this.modelData.handles[this.eventElementIndex + 1]
-              .step as number;
-          }
-        }
-        //Невозможность перескочить левый рычажок.
-        if (
-          this.eventElementIndex !== 0 &&
-          this.modelData.handles[this.eventElementIndex - 1].step !== undefined
-        ) {
-          if (
-            stepNow <
-            (this.modelData.handles[this.eventElementIndex - 1].step as number)
-          ) {
-            stepNow = this.modelData.handles[this.eventElementIndex - 1]
-              .step as number;
-          }
-        }
-      }
-
-      //Невозможность выйти за границы ролика.
-      if (stepNow < 0) {
-        stepNow = 0;
-      } else if (stepNow > this.modelData.maxSteps) {
-        stepNow = this.modelData.maxSteps;
-      }
-      //Смена позиции данного рычажка.
-      this.handleObj.step = stepNow;
-      this.handleObj.value = Number(
-        (this.modelData.minValue + stepNow * this.modelData.stepSize).toFixed(
-          this.modelData.numberRounding
-        )
-      );
-      //Возможность толкать рычажки на своём пути.
-      if (this.modelData.handlesCanPushed && this.modelData.handles) {
-        //Объекты рычажков слева.
-        const handlesLeft = this.DOMsOfSlider.DOMsSliderHandles.slice(
-          0,
-          this.eventElementIndex
-        );
-        //Объекты рычажков справа.
-        const handlesRight = this.DOMsOfSlider.DOMsSliderHandles.slice(
-          this.eventElementIndex + 1
-        );
-        //Толкание рычажков слева.
-        if (handlesLeft.length > 0) {
-          handlesLeft.forEach((handleDOMsObj) => {
-            //Индекс проверяемого рычажка.
-            const indexHandle = Number(
-              handleDOMsObj.DOMHandleView?.dataset.index
-            );
-            const stepHandle = (this.modelData.handles as IHandles[])[
-              indexHandle
-            ];
-            //Переделка проверяемого рычажка.
-            if ((stepHandle.step as number) > stepNow && this.handleObj) {
-              stepHandle.step = stepNow;
-              stepHandle.value = this.handleObj.value;
-            }
-          });
-        }
-        //Толкание рычажков справа.
-        if (handlesRight.length > 0) {
-          handlesRight.forEach((handleDOMsObj) => {
-            //Индекс проверяемого рычажка.
-            const indexHandle = Number(
-              handleDOMsObj.DOMHandleView?.dataset.index
-            );
-            const stepHandle = (this.modelData.handles as IHandles[])[
-              indexHandle
-            ];
-            //Переделка проверяемого рычажка.
-            if ((stepHandle.step as number) < stepNow && this.handleObj) {
-              stepHandle.step = stepNow;
-              stepHandle.value = this.handleObj.value;
-            }
-          });
-        }
-      }
-      this.viewMethods.renderViewHandles(this.DOMsOfSlider, this.modelData);
-      this.viewMethods.renderFillStrips(this.DOMsOfSlider);
-    }
+    this.mouseMoveArgs.rightShiftX = pageX - this.mouseMoveArgs.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
+    this.mouseMoveArgs.upShiftY = pageY - this.mouseMoveArgs.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
+    //Запуск методов, что выполняются при движении рычажка.
+    this.view.customEvents.onMouseMove.dispatch(
+      new EventArgs({ ...this.mouseMoveArgs })
+    );
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка.
-  private _handleMouseUp = (): void => {
-    document.removeEventListener("mousemove", this._handleMouseMove);
-    document.removeEventListener("mouseup", this._handleMouseUp);
+  private handleMouseUp = (): void => {
+    document.removeEventListener("mousemove", this.handleMouseMove);
+    document.removeEventListener("mouseup", this.handleMouseUp);
   };
 
-  private _getPositionElement = (
+  private getPositionElement = (
     HTMLDivElement: HTMLDivElement
   ): { top: number; left: number } => {
     const elementObj = HTMLDivElement.getBoundingClientRect();
 
-    const docEl = document.documentElement;
+    const scrollTop = document.body.scrollTop; //Прокрученная часть страницы по вертикали, px.
+    const scrollLeft = document.body.scrollLeft; //Прокрученная часть страницы по горизонтали, px.
 
-    const scrollTop = docEl.scrollTop; //Прокрученная часть страницы по вертикали, px.
-    const scrollLeft = docEl.scrollLeft; //Прокрученная часть страницы по горизонтали, px.
-
-    const clientTop = (this.DOMsOfSlider.DOMSliderRoller as HTMLDivElement)
+    const clientTop = (this.view.data.DOMSliderRoller as HTMLDivElement)
       .clientTop; //Ширина border сверху, px.
-    const clientLeft = (this.DOMsOfSlider.DOMSliderRoller as HTMLDivElement)
+    const clientLeft = (this.view.data.DOMSliderRoller as HTMLDivElement)
       .clientLeft; //Ширина border слева, px.
 
     const top = elementObj.top + scrollTop - clientTop;

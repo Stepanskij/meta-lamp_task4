@@ -1,18 +1,61 @@
 //импорт классов
 import HandleDragAndDrop from "./viewParts/HandleDragAndDrop";
+import Event from "rangeSlider/Event/Event";
+import EventArgs from "rangeSlider/Event/EventArgs";
 //импорт интерфейсов
-import IDOMsOfSlider from "rangeSlider/Data/IDOMsOfSlider";
+import IViewData from "rangeSlider/Data/IViewData";
 import IModelData from "rangeSlider/Data/IModelData";
 import IDOMsSliderHandles from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
+import IDOMsScaleMark from "rangeSlider/Data/DOMsData/IDOMsScaleMark";
+import IHandleMouseMove from "rangeSlider/Data/IHandleMouseMove";
 
 class View {
-  constructor(private modelData: IModelData) {}
+  data: IViewData = {
+    DOMsSliderHandles: [],
+    DOMsScaleMarkers: [],
+    DOMsFillStrips: [],
+  };
 
-  //Создание HTML-элементов, что не могут измениться.
-  createBaseElements = (DOMDiv: HTMLDivElement): HTMLDivElement[] => {
+  customEvents = {
+    onMouseMove: new Event<IHandleMouseMove>(),
+  };
+  handleDragAndDrop = new HandleDragAndDrop(this);
+
+  constructor() {}
+
+  loadContent = () => {};
+
+  makeSlider = (DOMDiv: HTMLDivElement, modelData: IModelData): void => {
+    this.createBaseElements(DOMDiv, modelData); //Создаёт базовые элементы слайдера.
+    //Создаются элементы рычажков слайдера.
+    modelData.handles?.forEach((handleObj, index) => {
+      this.createHandleElement(index);
+    });
+    //Создаются элементы меток масштаба слайдера.
+    modelData.scaleData?.markArray?.forEach(() => {
+      this.createScaleMarker();
+    });
+    //Создание полосок заполнения рычажков.
+    if (modelData.bordersFillStrips) {
+      modelData.bordersFillStrips.forEach((rightBorderStrip) => {
+        this.createFillStrip(rightBorderStrip);
+      });
+    }
+    //Навешание ивентов HandleDragAndDrop на рычажки.
+    modelData.handles?.forEach((handleObj, index) => {
+      if (this.data.DOMsSliderHandles)
+        this.handleDragAndDrop.addEvent(this.data.DOMsSliderHandles[index]);
+    });
+  };
+
+  //Создание базовых HTML-элементов.
+  private createBaseElements = (
+    DOMDiv: HTMLDivElement,
+    modelData: IModelData
+  ): void => {
     const DOMRangeSlider = document.createElement("div");
     DOMRangeSlider.className = "range-slider";
-    if (this.modelData.isVertical)
+    if (modelData.isVertical)
       DOMRangeSlider.classList.add("range-slider_vertical");
     //
     const DOMSliderRoller = document.createElement("div");
@@ -25,13 +68,12 @@ class View {
     DOMRangeSlider.insertAdjacentElement("beforeend", DOMSliderRoller);
     DOMRangeSlider.insertAdjacentElement("beforeend", DOMScaleContainer);
 
-    return [DOMRangeSlider, DOMSliderRoller, DOMScaleContainer];
+    this.data.DOMRangeSlider = DOMRangeSlider;
+    this.data.DOMSliderRoller = DOMSliderRoller;
+    this.data.DOMScaleContainer = DOMScaleContainer;
   };
   //Создание рычажка.
-  createHandleElement = (
-    DOMSliderRoller: HTMLDivElement,
-    index: number
-  ): HTMLDivElement[] => {
+  private createHandleElement = (index: number): void => {
     const DOMHandleContainer = document.createElement("div");
     DOMHandleContainer.className = "range-slider__handle-container";
     //
@@ -45,20 +87,24 @@ class View {
     const DOMHandleValueText = document.createElement("div");
     DOMHandleValueText.className = "range-slider__handle-value-text";
     //
-    DOMSliderRoller.insertAdjacentElement("beforeend", DOMHandleContainer);
+    if (this.data.DOMSliderRoller)
+      this.data.DOMSliderRoller.insertAdjacentElement(
+        "beforeend",
+        DOMHandleContainer
+      );
     DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleValue);
     DOMHandleValue.insertAdjacentElement("beforeend", DOMHandleValueText);
     DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleView);
     //
-    return [
-      DOMHandleContainer,
-      DOMHandleView,
-      DOMHandleValue,
-      DOMHandleValueText,
-    ];
+    (this.data.DOMsSliderHandles as IDOMsSliderHandles[]).push({
+      DOMHandleContainer: DOMHandleContainer,
+      DOMHandleView: DOMHandleView,
+      DOMHandleValue: DOMHandleValue,
+      DOMHandleValueText: DOMHandleValueText,
+    });
   };
   //Создание метки шкалы масштаба.
-  createScaleMarker = (DOMsOfSlider: IDOMsOfSlider): HTMLDivElement[] => {
+  private createScaleMarker = (): void => {
     const DOMScaleMarkContainer = document.createElement("div");
     DOMScaleMarkContainer.className = "range-slider__scale-mark-container";
     //
@@ -77,46 +123,42 @@ class View {
     );
     DOMScaleMarkContainer.insertAdjacentElement("beforeend", DOMScaleMarkValue);
     DOMScaleMarkValue.insertAdjacentElement("beforeend", DOMScaleMarkValueText);
-    if (DOMsOfSlider.DOMScaleContainer)
-      DOMsOfSlider.DOMScaleContainer.insertAdjacentElement(
+    if (this.data.DOMScaleContainer)
+      this.data.DOMScaleContainer.insertAdjacentElement(
         "beforeend",
         DOMScaleMarkContainer
       );
-    return [
-      DOMScaleMarkContainer,
-      DOMScaleMarkSeparator,
-      DOMScaleMarkValue,
-      DOMScaleMarkValueText,
-    ];
+    (this.data.DOMsScaleMarkers as IDOMsScaleMark[]).push({
+      DOMScaleMarkContainer: DOMScaleMarkContainer,
+      DOMScaleMarkSeparator: DOMScaleMarkSeparator,
+      DOMScaleMarkValue: DOMScaleMarkValue,
+      DOMScaleMarkValueText: DOMScaleMarkValueText,
+    });
   };
   //Создание полосы заполнения.
-  createFillStrip = (
-    DOMsOfSlider: IDOMsOfSlider,
-    leftBorderNumber: number
-  ): HTMLDivElement => {
+  private createFillStrip = (leftBorderNumber: number): void => {
     const DOMFillStrip = document.createElement("div");
     DOMFillStrip.className = "range-slider__flip-scrip";
     DOMFillStrip.dataset.leftBorderNumber = `${leftBorderNumber}`;
     //
-    if (DOMsOfSlider.DOMSliderRoller)
-      DOMsOfSlider.DOMSliderRoller.insertAdjacentElement(
+    if (this.data.DOMSliderRoller)
+      this.data.DOMSliderRoller.insertAdjacentElement(
         "beforeend",
         DOMFillStrip
       );
-    return DOMFillStrip;
+    (this.data.DOMsFillStrips as HTMLDivElement[]).push(DOMFillStrip);
   };
   //Отрисовка элементов View по данным Model.
-  renderView = (DOMsOfSlider: IDOMsOfSlider, modelData: IModelData): void => {
-    this.renderViewHandles(DOMsOfSlider, modelData);
-    this.renderViewScaleMarkers(DOMsOfSlider, modelData);
-    this.renderFillStrips(DOMsOfSlider);
+  renderView = (modelData?: EventArgs<IModelData>): void => {
+    if (modelData?.data) {
+      this.renderViewHandles(modelData?.data);
+      this.renderViewScaleMarkers(modelData?.data);
+      this.renderFillStrips(modelData?.data);
+    }
   };
   //Отрисовка положений маркеров на шкале масштаба.
-  renderViewScaleMarkers = (
-    DOMsOfSlider: IDOMsOfSlider,
-    modelData: IModelData
-  ): void => {
-    DOMsOfSlider.DOMsScaleMarkers?.forEach((DOMsScaleMarker, index) => {
+  private renderViewScaleMarkers = (modelData: IModelData): void => {
+    this.data.DOMsScaleMarkers?.forEach((DOMsScaleMarker, index) => {
       if (
         DOMsScaleMarker.DOMScaleMarkValueText &&
         DOMsScaleMarker.DOMScaleMarkContainer &&
@@ -130,7 +172,7 @@ class View {
           ((modelData.scaleData.markArray[index] - modelData.minValue) /
             (modelData.maxValue - modelData.minValue)) *
           100;
-        if (!this.modelData.isVertical) {
+        if (!modelData.isVertical) {
           DOMsScaleMarker.DOMScaleMarkContainer.setAttribute(
             "style",
             `left:${styleLeft}%`
@@ -145,58 +187,55 @@ class View {
     });
   };
   //Отрисовка положений рычажков.
-  renderViewHandles = (
-    DOMsOfSlider: IDOMsOfSlider,
-    modelData: IModelData
-  ): void => {
+  private renderViewHandles = (modelData: IModelData): void => {
     //Постановка рычажков на своё место по шагу(step).
     modelData.handles?.forEach((handleObj, index) => {
       if (
         handleObj.step !== undefined &&
         modelData.maxSteps !== undefined &&
-        DOMsOfSlider.DOMsSliderHandles !== undefined
+        this.data.DOMsSliderHandles !== undefined
       ) {
         const styleLeft = (handleObj.step / modelData.maxSteps) * 100;
-        if (!this.modelData.isVertical) {
+        if (!modelData.isVertical) {
           (
-            DOMsOfSlider.DOMsSliderHandles[index]
+            this.data.DOMsSliderHandles[index]
               .DOMHandleContainer as HTMLDivElement
           ).setAttribute("style", `left:${styleLeft}%`);
         } else {
           (
-            DOMsOfSlider.DOMsSliderHandles[index]
+            this.data.DOMsSliderHandles[index]
               .DOMHandleContainer as HTMLDivElement
           ).setAttribute("style", `bottom:${styleLeft}%`);
         }
       }
       //Перерисовка значений облачков над рычажками.
       modelData.handles?.forEach((handleObj, index) => {
-        if (DOMsOfSlider.DOMsSliderHandles) {
+        if (this.data.DOMsSliderHandles) {
           (
-            DOMsOfSlider.DOMsSliderHandles[index]
+            this.data.DOMsSliderHandles[index]
               .DOMHandleValueText as HTMLDivElement
           ).innerHTML = `${handleObj.value}`;
         }
       });
     });
   };
-  renderFillStrips = (DOMsOfSlider: IDOMsOfSlider): void => {
-    DOMsOfSlider.DOMsFillStrips?.forEach((DOMFillStrip) => {
-      if (DOMsOfSlider.DOMsSliderHandles) {
+  private renderFillStrips = (modelData: IModelData): void => {
+    this.data.DOMsFillStrips?.forEach((DOMFillStrip) => {
+      if (this.data.DOMsSliderHandles) {
         const leftBorderNumber = Number(DOMFillStrip.dataset.leftBorderNumber);
         let styleLeftBorder = 0;
         let styleRightBorder = 100;
         //Находим отступ левой границы от левого края ролика, %.
         if (leftBorderNumber > 0) {
-          if (!this.modelData.isVertical) {
+          if (!modelData.isVertical) {
             styleLeftBorder = Number(
-              DOMsOfSlider.DOMsSliderHandles[
+              this.data.DOMsSliderHandles[
                 leftBorderNumber - 1
               ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
             );
           } else {
             styleLeftBorder = Number(
-              DOMsOfSlider.DOMsSliderHandles[
+              this.data.DOMsSliderHandles[
                 leftBorderNumber - 1
               ].DOMHandleContainer?.style.bottom.replace(/[%]/g, "")
             );
@@ -205,17 +244,17 @@ class View {
         //Находим отступ правой границы от левого края ролика, %.
         if (
           leftBorderNumber <
-          (DOMsOfSlider.DOMsSliderHandles as IDOMsSliderHandles[]).length
+          (this.data.DOMsSliderHandles as IDOMsSliderHandles[]).length
         ) {
-          if (!this.modelData.isVertical) {
+          if (!modelData.isVertical) {
             styleRightBorder = Number(
-              DOMsOfSlider.DOMsSliderHandles[
+              this.data.DOMsSliderHandles[
                 leftBorderNumber
               ].DOMHandleContainer?.style.left.replace(/[%]/g, "")
             );
           } else {
             styleRightBorder = Number(
-              DOMsOfSlider.DOMsSliderHandles[
+              this.data.DOMsSliderHandles[
                 leftBorderNumber
               ].DOMHandleContainer?.style.bottom.replace(/[%]/g, "")
             );
@@ -224,7 +263,7 @@ class View {
         //
         const styleLeft = styleLeftBorder;
         const styleWidth = styleRightBorder - styleLeftBorder;
-        if (!this.modelData.isVertical) {
+        if (!modelData.isVertical) {
           DOMFillStrip.setAttribute(
             "style",
             `width:${styleWidth}%; left:${styleLeft}%`
@@ -237,21 +276,6 @@ class View {
         }
       }
     });
-  };
-  //Подписание рычажков на события перетаскивания.
-  subscriptionHandleEvent = (
-    DOMSliderHandle: IDOMsSliderHandles,
-    DOMsOfSlider: IDOMsOfSlider,
-    modelData: IModelData,
-    viewMethods: View
-  ): void => {
-    const handlerDragAndDrop: HandleDragAndDrop = new HandleDragAndDrop(
-      DOMSliderHandle,
-      DOMsOfSlider,
-      modelData,
-      viewMethods
-    );
-    handlerDragAndDrop.addEvent();
   };
 }
 

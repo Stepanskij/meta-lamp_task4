@@ -1,7 +1,7 @@
 import IDOMsSliderHandle from "./DOMsData/IDOMsSliderHandle";
 import IDOMsScaleMark from "./DOMsData/IDOMsScaleMark";
 
-interface IDOMsOfSlider {
+interface IViewData {
   DOMRangeSlider?: HTMLDivElement;
   DOMSliderRoller?: HTMLDivElement;
   DOMsSliderHandles?: IDOMsSliderHandle[];
@@ -10,4 +10,4 @@ interface IDOMsOfSlider {
   DOMsFillStrips?: HTMLDivElement[];
 }
 
-export default IDOMsOfSlider;
+export default IViewData;

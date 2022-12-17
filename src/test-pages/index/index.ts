@@ -10,11 +10,10 @@ const userModelData: IModelData = {
   stepSize: 3.017,
   maxValue: 40,
   minValue: -12,
-  handles: [{ value: 0 }, { value: 20 }],
+  handles: [{ value: 0 }, { value: 20 }, { value: 30 }],
   scaleData: { customMarkArray: [10, -12], numberAutoMark: 3 },
   handlesCanPushed: true,
   bordersFillStrips: [1],
-  isVertical: true,
 };
 
 const controller1 = new Controller(
