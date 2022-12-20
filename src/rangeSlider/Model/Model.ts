@@ -22,8 +22,8 @@ class Model {
   }
 
   loadContent = () => {
-    this.getNumberRounding(); //Корректирует количество значений после запятой.
     this.fixMaxValue(); //Исправляет максимальное значение.
+    this.getNumberRounding(); //Корректирует количество значений после запятой.
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
     this.sortBordersFillStrips(); //Сортирует массив полос заполненности.
     this.reconstructionHandlesArray(this.data.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
@@ -163,6 +163,12 @@ class Model {
       this.data.minValue !== undefined &&
       this.data.stepSize !== undefined
     ) {
+      if (
+        this.data.maxValue < this.data.minValue ||
+        this.data.maxValue === this.data.minValue
+      ) {
+        this.data.maxValue = this.data.minValue + this.data.stepSize;
+      }
       let remainder =
         (this.data.maxValue - this.data.minValue) % this.data.stepSize;
       if (remainder)
@@ -230,7 +236,7 @@ class Model {
       const stepWidth = handleMoveArgs.data.rollerWidth / this.data.maxSteps;
       const stepHeight = handleMoveArgs.data.rollerHeight / this.data.maxSteps;
       const handleIndex = handleMoveArgs.data.eventElementIndex;
-      const handleObj = this.data.handles[handleIndex];
+      const handleObjByIndex = this.data.handles[handleIndex];
 
       if (!this.data.isVertical) {
         stepNow = Math.round(handleMoveArgs.data.rightShiftX / stepWidth);
@@ -239,7 +245,7 @@ class Model {
           this.data.maxSteps -
           Math.round(handleMoveArgs.data.upShiftY / stepHeight);
 
-      if (handleObj) {
+      if (handleObjByIndex) {
         //Невозможность перескочить соседние рычажки (когда отсутствует толкание).
         if (!this.data.handlesCanPushed && this.data.handles) {
           //Невозможность перескочить правый рычажок.
@@ -272,8 +278,8 @@ class Model {
           stepNow = this.data.maxSteps;
         }
         //Смена позиции данного рычажка.
-        handleObj.step = stepNow;
-        handleObj.value = Number(
+        handleObjByIndex.step = stepNow;
+        handleObjByIndex.value = Number(
           (this.data.minValue + stepNow * this.data.stepSize).toFixed(
             this.data.numberRounding
           )
@@ -290,7 +296,7 @@ class Model {
               handleObj
             ) {
               stepHandle.step = stepNow;
-              stepHandle.value = handleObj.value;
+              stepHandle.value = handleObjByIndex.value;
             }
             //Толкание вправо.
             if (
@@ -299,7 +305,7 @@ class Model {
               handleObj
             ) {
               stepHandle.step = stepNow;
-              stepHandle.value = handleObj.value;
+              stepHandle.value = handleObjByIndex.value;
             }
           });
         }

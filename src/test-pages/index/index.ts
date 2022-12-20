@@ -8,8 +8,8 @@ const DOMTestSlider1: HTMLDivElement | null =
 
 const userModelData: IModelData = {
   stepSize: 3.017,
-  maxValue:-10,
-  minValue: -100,
+  maxValue:0,
+  minValue: 10,
   handles: [{ value: 0 }, { value: -20 }, { value: -50 }],
   scaleData: { customMarkArray: [10, -12], numberAutoMark: 3 },
   handlesCanPushed: true,
