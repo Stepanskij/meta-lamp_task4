@@ -1,11 +1,12 @@
 import IModelData from "rangeSlider/Data/IModelData";
 import IHandles from "rangeSlider/Data/IHandles";
-import IHandleMouseMove from "rangeSlider/Data/IHandleMouseMove";
+import IDnDArgsUpdate from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
 
 import scaleDataMethods from "./modelParts/scaleDataMethods";
 import CustomEvent from "rangeSlider/Event/Event";
 import CustomEventArgs from "rangeSlider/Event/EventArgs";
 import EventArgs from "rangeSlider/Event/EventArgs";
+import IHandleMarksArgsUpdate from "rangeSlider/Data/updateArgs/IHandleMarksArgsUpdate";
 
 class Model {
   data: IModelData = {};
@@ -29,10 +30,36 @@ class Model {
     this.scaleDataMethods.fixedCustomMark();
     this.scaleDataMethods.fixedNumberAutoMark();
     this.scaleDataMethods.makeMarkArray();
+    console.log(this.data);
   };
-  update = (mouseMoveArgs?: CustomEventArgs<IHandleMouseMove>): void => {
-    if (mouseMoveArgs !== undefined) {
-      this.newHandlePosition(mouseMoveArgs);
+  update = (newModelData?: IModelData): void => {
+    const modelData = this.data;
+    if (newModelData) {
+      if (newModelData.minValue !== undefined)
+        modelData.minValue = newModelData.minValue;
+      if (newModelData.stepSize !== undefined)
+        modelData.stepSize = newModelData.stepSize;
+      if (newModelData.maxValue !== undefined)
+        modelData.maxValue = newModelData.maxValue;
+      if (newModelData.handles !== undefined)
+        modelData.handles = newModelData.handles;
+      if (newModelData.handlesCanPushed !== undefined)
+        modelData.handlesCanPushed = newModelData.handlesCanPushed;
+      if (newModelData.isVertical !== undefined)
+        modelData.isVertical = newModelData.isVertical;
+      if (newModelData.scaleData !== undefined) {
+        if (modelData.scaleData === undefined) modelData.scaleData = {};
+        if (newModelData.scaleData.customMarkArray !== undefined)
+          modelData.scaleData.customMarkArray =
+            newModelData.scaleData.customMarkArray;
+        if (newModelData.scaleData.numberAutoMark !== undefined)
+          modelData.scaleData.numberAutoMark =
+            newModelData.scaleData.numberAutoMark;
+      }
+      if (newModelData.bordersFillStrips !== undefined)
+        modelData.bordersFillStrips = newModelData.bordersFillStrips;
+      if (newModelData.numberRounding !== undefined)
+        modelData.numberRounding = newModelData.numberRounding;
     }
     //Запуск методов, что выполняются при обновлении модели.
     this.customEvents.onUpdate.dispatch(new EventArgs({ ...this.data }));
@@ -98,7 +125,7 @@ class Model {
     this.data.handles?.pop();
   };
   //Расчёт количества шагов (делений) слайдера.
-  getMaxSteps = (): void => {
+  private getMaxSteps = (): void => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -110,7 +137,7 @@ class Model {
     }
   };
   //Расчёт количества цифр после запятой.
-  getNumberRounding = (): void => {
+  private getNumberRounding = (): void => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -130,7 +157,7 @@ class Model {
     }
   };
   //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
-  fixMaxValue = (): void => {
+  private fixMaxValue = (): void => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -147,7 +174,7 @@ class Model {
     }
   };
   //Сортировать массив bordersFillStrips на некорректные значения.
-  sortBordersFillStrips = (): void => {
+  private sortBordersFillStrips = (): void => {
     if (this.data.bordersFillStrips) {
       //Округляем выходящие за пределы ролика значения.
       this.data.bordersFillStrips = this.data.bordersFillStrips.map(
@@ -173,31 +200,30 @@ class Model {
   };
   //Задать значения свойствам модели, если те не были переданы User-ом.
   private makeDefaultModelValues = (): void => {
-    const data = this.data;
-    if (data.minValue === undefined) data.minValue = -10;
-    if (data.stepSize === undefined) data.stepSize = 1;
-    if (data.maxValue === undefined) data.maxValue = 10;
-    if (data.handles === undefined) data.handles = [{ value: 0 }];
-    if (data.handlesCanPushed === undefined) data.handlesCanPushed = false;
-    if (data.isVertical === undefined) data.isVertical = false;
-    if (data.scaleData === undefined) {
-      data.scaleData = {};
-      if (data.scaleData.customMarkArray === undefined)
-        data.scaleData.customMarkArray = [];
-      if (data.scaleData.numberAutoMark === undefined)
-        data.scaleData.numberAutoMark = 0;
-    }
-    if (data.bordersFillStrips === undefined) data.bordersFillStrips = [0];
-    if (data.numberRounding === undefined) data.numberRounding = 0;
+    if (this.data.minValue === undefined) this.data.minValue = -10;
+    if (this.data.stepSize === undefined) this.data.stepSize = 1;
+    if (this.data.maxValue === undefined) this.data.maxValue = 10;
+    if (this.data.handles === undefined) this.data.handles = [{ value: 0 }];
+    if (this.data.handlesCanPushed === undefined)
+      this.data.handlesCanPushed = false;
+    if (this.data.isVertical === undefined) this.data.isVertical = false;
+    if (this.data.scaleData === undefined) this.data.scaleData = {};
+    if (this.data.scaleData.customMarkArray === undefined)
+      this.data.scaleData.customMarkArray = [];
+    if (this.data.scaleData.numberAutoMark === undefined)
+      this.data.scaleData.numberAutoMark = 0;
+    if (this.data.bordersFillStrips === undefined)
+      this.data.bordersFillStrips = [0];
+    if (this.data.numberRounding === undefined) this.data.numberRounding = 0;
   };
-  //Изменение позиции рычажка.
-  private newHandlePosition = (
-    handleMoveArgs: CustomEventArgs<IHandleMouseMove>
-  ): void => {
+  //Изменение позиции рычажка мышью.
+  DaDModelUpdate = (handleMoveArgs?: CustomEventArgs<IDnDArgsUpdate>): void => {
+    const newModelData: IModelData = {};
     if (
+      handleMoveArgs &&
       this.data.handles &&
-      this.data.maxSteps &&
-      this.data.minValue &&
+      this.data.maxSteps !== undefined &&
+      this.data.minValue !== undefined &&
       this.data.stepSize
     ) {
       let stepNow: number = 0;
@@ -278,6 +304,31 @@ class Model {
           });
         }
       }
+    }
+    this.update(newModelData);
+  };
+  markerModelUpdate = (
+    handleMoveArgs?: CustomEventArgs<IHandleMarksArgsUpdate>
+  ) => {
+    const newModelData: IModelData = {};
+    let newHandlesArr: IHandles[] = [...(this.data.handles as IHandles[])];
+    if (
+      handleMoveArgs &&
+      this.data.minValue !== undefined &&
+      this.data.stepSize
+    ) {
+      let arrAbs: Array<number>;
+      arrAbs = (newHandlesArr as IHandles[]).map((handleObj) => {
+        return Math.abs(handleObj.value - handleMoveArgs.data.markerValue);
+      });
+      const minHandleIndex = arrAbs.indexOf(Math.min(...arrAbs)); //Индекс ближайшего к маркеру рычажка.
+      newHandlesArr[minHandleIndex].value = handleMoveArgs.data.markerValue;
+      newHandlesArr[minHandleIndex].step = Math.round(
+        (handleMoveArgs.data.markerValue - this.data.minValue) /
+          this.data.stepSize
+      );
+      newModelData.handles = newHandlesArr;
+      this.update(newModelData);
     }
   };
 }

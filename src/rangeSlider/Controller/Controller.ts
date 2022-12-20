@@ -26,7 +26,8 @@ class Controller {
 
   loadContent = (): void => {
     this.model.loadContent();
-    this.view.customEvents.onMouseMove.subscribe(this.model.update);
+    this.view.customEvents.onMouseMove.subscribe(this.model.DaDModelUpdate);
+    this.view.customEvents.onMouseClick.subscribe(this.model.markerModelUpdate);
     this.model.customEvents.onUpdate.subscribe(this.view.renderView);
   };
 }

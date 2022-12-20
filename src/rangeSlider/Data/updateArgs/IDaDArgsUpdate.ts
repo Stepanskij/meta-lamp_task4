@@ -1,4 +1,4 @@
-interface IHandleMouseMove {
+interface IDnDArgsUpdate {
   rollerWidth: number;
   rollerHeight: number;
   rollerPageX: number;
@@ -8,4 +8,4 @@ interface IHandleMouseMove {
   upShiftY: number;
 }
 
-export default IHandleMouseMove;
+export default IDnDArgsUpdate;

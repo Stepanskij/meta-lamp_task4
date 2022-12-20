@@ -2,10 +2,10 @@ import View from "../View";
 import EventArgs from "rangeSlider/Event/EventArgs";
 
 import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
-import IHandleMouseMove from "rangeSlider/Data/IHandleMouseMove";
+import IHandleMouseMove from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
 
 class HandleDragAndDrop {
-  private mouseMoveArgs: IHandleMouseMove = {
+  private DaDArgs: IHandleMouseMove = {
     rollerWidth: 0,
     rollerHeight: 0,
     rollerPageX: 0,
@@ -51,23 +51,23 @@ class HandleDragAndDrop {
       eventClick = eventDown;
     }
     //Обнуление сдвигов при клике на рычажок.
-    this.mouseMoveArgs.rightShiftX = 0;
-    this.mouseMoveArgs.upShiftY = 0;
+    this.DaDArgs.rightShiftX = 0;
+    this.DaDArgs.upShiftY = 0;
     //Запоминание неизменных свойств при клике на рычажок.
     if (eventClick && this.view.data.DOMSliderRoller) {
       const eventElement = eventClick.target as HTMLDivElement; //view-элемент рычажка.
-      this.mouseMoveArgs.eventElementIndex = Number(eventElement.dataset.index); //Получение индекса рычажка.
-      this.mouseMoveArgs.rollerWidth =
+      this.DaDArgs.eventElementIndex = Number(eventElement.dataset.index); //Получение индекса рычажка.
+      this.DaDArgs.rollerWidth =
         this.view.data.DOMSliderRoller.offsetWidth -
         this.view.data.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
-      this.mouseMoveArgs.rollerHeight =
+      this.DaDArgs.rollerHeight =
         this.view.data.DOMSliderRoller.offsetHeight -
         this.view.data.DOMSliderRoller.clientTop * 2; //Высота ролика при клике, px.
 
-      this.mouseMoveArgs.rollerPageX = this.getPositionElement(
+      this.DaDArgs.rollerPageX = this.getPositionElement(
         this.view.data.DOMSliderRoller
       ).left; //Левый отступ ролика относительно страницы.
-      this.mouseMoveArgs.rollerPageY = this.getPositionElement(
+      this.DaDArgs.rollerPageY = this.getPositionElement(
         this.view.data.DOMSliderRoller
       ).top; //Верхний отступ ролика относительно страницы.
     }
@@ -88,11 +88,11 @@ class HandleDragAndDrop {
       pageY = eventMove.pageY;
     }
 
-    this.mouseMoveArgs.rightShiftX = pageX - this.mouseMoveArgs.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
-    this.mouseMoveArgs.upShiftY = pageY - this.mouseMoveArgs.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
+    this.DaDArgs.rightShiftX = pageX - this.DaDArgs.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
+    this.DaDArgs.upShiftY = pageY - this.DaDArgs.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
     //Запуск методов, что выполняются при движении рычажка.
     this.view.customEvents.onMouseMove.dispatch(
-      new EventArgs({ ...this.mouseMoveArgs })
+      new EventArgs({ ...this.DaDArgs })
     );
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка.

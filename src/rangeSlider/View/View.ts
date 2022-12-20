@@ -1,5 +1,6 @@
 //импорт классов
 import HandleDragAndDrop from "./viewParts/HandleDragAndDrop";
+import HandleMarks from "./viewParts/HandleMarks";
 import Event from "rangeSlider/Event/Event";
 import EventArgs from "rangeSlider/Event/EventArgs";
 //импорт интерфейсов
@@ -7,7 +8,8 @@ import IViewData from "rangeSlider/Data/IViewData";
 import IModelData from "rangeSlider/Data/IModelData";
 import IDOMsSliderHandles from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
 import IDOMsScaleMark from "rangeSlider/Data/DOMsData/IDOMsScaleMark";
-import IHandleMouseMove from "rangeSlider/Data/IHandleMouseMove";
+import IDaDArgsUpdate from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
+import IHandleMarksArgsUpdate from "rangeSlider/Data/updateArgs/IHandleMarksArgsUpdate";
 
 class View {
   data: IViewData = {
@@ -17,9 +19,11 @@ class View {
   };
 
   customEvents = {
-    onMouseMove: new Event<IHandleMouseMove>(),
+    onMouseMove: new Event<IDaDArgsUpdate>(),
+    onMouseClick: new Event<IHandleMarksArgsUpdate>(),
   };
   handleDragAndDrop = new HandleDragAndDrop(this);
+  handleMarks = new HandleMarks(this);
 
   constructor() {}
 
@@ -45,6 +49,11 @@ class View {
     modelData.handles?.forEach((handleObj, index) => {
       if (this.data.DOMsSliderHandles)
         this.handleDragAndDrop.addEvent(this.data.DOMsSliderHandles[index]);
+    });
+    //
+    modelData.scaleData?.markArray?.forEach((markNumber, index) => {
+      if (this.data.DOMsScaleMarkers)
+        this.handleMarks.addEvent(this.data.DOMsScaleMarkers[index]);
     });
   };
 
@@ -164,8 +173,8 @@ class View {
         DOMsScaleMarker.DOMScaleMarkContainer &&
         modelData.scaleData &&
         modelData.scaleData.markArray &&
-        modelData.maxValue &&
-        modelData.minValue
+        modelData.maxValue !== undefined &&
+        modelData.minValue !== undefined
       ) {
         DOMsScaleMarker.DOMScaleMarkValueText.innerHTML = `${modelData.scaleData.markArray[index]}`;
         const styleLeft =

@@ -5,21 +5,21 @@ class scaleDataMethods {
   private scaleData: IScaleData;
 
   constructor(private modelData: IModelData) {
-    this.scaleData = this.modelData.scaleData as IScaleData;    
+    this.scaleData = this.modelData.scaleData as IScaleData;
   }
   //Исправляет значение кастомной метки, приравнивая значение к ближайшему возможному значению.
   fixedCustomMark = (): void => {
     if (
-      this.scaleData.customMarkArray &&
+      this.scaleData.customMarkArray !== undefined &&
       this.scaleData.customMarkArray.length
     ) {
       this.scaleData.customMarkArray = this.scaleData.customMarkArray.map(
         (markValue): number => {
           let fixValue = 0;
           if (
-            this.modelData.maxValue &&
-            this.modelData.stepSize &&
-            this.modelData.minValue
+            this.modelData.maxValue !== undefined &&
+            this.modelData.stepSize !== undefined &&
+            this.modelData.minValue !== undefined
           ) {
             const stepOfMark = Math.round(
               (markValue - this.modelData.minValue) / this.modelData.stepSize
@@ -34,7 +34,10 @@ class scaleDataMethods {
     }
   };
   fixedNumberAutoMark = (): void => {
-    if (this.scaleData.numberAutoMark && this.modelData.maxSteps) {
+    if (
+      this.scaleData.numberAutoMark !== undefined &&
+      this.modelData.maxSteps !== undefined
+    ) {
       if (this.scaleData.numberAutoMark > this.modelData.maxSteps + 1) {
         this.scaleData.numberAutoMark = this.modelData.maxSteps + 1;
       }
@@ -44,9 +47,9 @@ class scaleDataMethods {
   private makeAutoMarkArray = (numberAutoMark: number): number[] => {
     let markArray: number[] = [];
     if (
-      this.modelData.minValue &&
-      this.modelData.maxSteps &&
-      this.modelData.stepSize
+      this.modelData.minValue !== undefined &&
+      this.modelData.maxSteps !== undefined &&
+      this.modelData.stepSize !== undefined
     ) {
       if (numberAutoMark >= 1) markArray.push(this.modelData.minValue); //Добавить метку начала.
       if (numberAutoMark >= 2)
@@ -110,7 +113,7 @@ class scaleDataMethods {
     const autoMarkArray = this.makeAutoMarkArray(
       this.scaleData.numberAutoMark as number
     );
-    if (this.scaleData.customMarkArray) {
+    if (this.scaleData.customMarkArray !== undefined) {
       //Объединение кастомного и автоматически созданного массива.
       this.scaleData.markArray = autoMarkArray.concat(
         this.scaleData.customMarkArray
@@ -118,8 +121,8 @@ class scaleDataMethods {
       //Выкидывание, выхдящих за пределы ролика, значений.
       this.scaleData.markArray = this.scaleData.markArray.filter((number) => {
         return (
-          this.modelData.maxValue &&
-          this.modelData.minValue &&
+          this.modelData.maxValue !== undefined &&
+          this.modelData.minValue !== undefined &&
           !(
             number > this.modelData.maxValue || number < this.modelData.minValue
           )
