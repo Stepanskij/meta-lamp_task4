@@ -30,7 +30,6 @@ class Model {
     this.scaleDataMethods.fixedCustomMark();
     this.scaleDataMethods.fixedNumberAutoMark();
     this.scaleDataMethods.makeMarkArray();
-    console.log(this.data);
   };
   update = (newModelData?: IModelData): void => {
     const modelData = this.data;

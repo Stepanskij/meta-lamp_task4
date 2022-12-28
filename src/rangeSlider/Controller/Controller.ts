@@ -30,6 +30,17 @@ class Controller {
     this.view.customEvents.onMouseClick.subscribe(this.model.markerModelUpdate);
     this.model.customEvents.onUpdate.subscribe(this.view.renderView);
   };
+
+  remakeSlider = (userModelData?: IModelData): void => {
+    if (userModelData) {
+      this.model = new Model(userModelData);
+    } else this.model = new Model();
+    this.view = new View();
+    this.DOMDiv.innerHTML = "";
+    this.loadContent();
+    this.view.makeSlider(this.DOMDiv, { ...this.model.data });
+    this.view.renderView(new EventArgs({ ...this.model.data }));
+  };
 }
 
 export default Controller;

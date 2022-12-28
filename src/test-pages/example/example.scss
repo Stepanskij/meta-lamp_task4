@@ -1,0 +1,13 @@
+@import "../../shared/base.scss";
+@import "../../shared/sliderStyles/rangeSlider.scss";
+
+.example {
+  margin: 40px 0 0 10px;
+  &__slider {
+    height: 100px;
+    padding: 20px;
+    border: solid 1px;
+    border-radius: 5px;
+    border-color: black;
+  }
+}

@@ -1,6 +1,5 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-/* const CopyWebpackPlugin = require("copy-webpack-plugin"); */
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const PATHS = {
@@ -9,28 +8,18 @@ const PATHS = {
   assets: "assets/",
 };
 
-/* const pages = []; */
-
 const pluginsOptions = [];
-/* pages.forEach((e) => {
-  pluginsOptions.push(
-    new HtmlWebpackPlugin({
-      filename: `./${e.pageName}.html`,
-      template: `${PATHS.src}/pages/${e.pageType}/${e.pageName}/${e.pageName}.pug`,
-      inject: true,
-      chunks: [e.pageName],
-    })
-  );
-}); */
 
 const entries = {};
-/* = pages.reduce((obj, curEntry) => {
-  obj[
-    curEntry.pageName
-  ] = `${PATHS.src}/pages/${curEntry.pageType}/${curEntry.pageName}/${curEntry.pageName}.ts`;
-  return obj;
-}, {}); */
 
+pluginsOptions.push(
+  new HtmlWebpackPlugin({
+    filename: "./example.html",
+    template: `${PATHS.src}/test-pages/example/example.pug`,
+    inject: true,
+    chunks: ["example"],
+  })
+);
 pluginsOptions.push(
   new HtmlWebpackPlugin({
     filename: "./index.html",
@@ -39,6 +28,8 @@ pluginsOptions.push(
     chunks: ["index"],
   })
 );
+
+entries.example = `${PATHS.src}/test-pages/example/example.ts`;
 entries.index = `${PATHS.src}/test-pages/index/index.ts`;
 
 pluginsOptions.push(
@@ -46,12 +37,6 @@ pluginsOptions.push(
     filename: "[name].css",
   })
 );
-
-/* pluginsOptions.push(
-  new CopyWebpackPlugin([
-    { from: `${PATHS.src}/shared/img`, to: `${PATHS.assets}img` },
-  ])
-); */
 
 module.exports = {
   externals: {

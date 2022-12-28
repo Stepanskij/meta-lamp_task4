@@ -1,16 +1,21 @@
+$secondary-size: 15px;
+$handle-size: 20px;
+$font-size: 15px;
+//
+
 //Стили ролька.
 %slider-roller {
   position: absolute;
   display: flex;
   align-items: center;
   width: 100%;
-  height: 2.5px;
+  height: $secondary-size;
   background-color: white;
-  border: 0.5px solid black;
+  border: 1px solid black;
 }
 %slider-roller-vertical {
   @extend %slider-roller;
-  width: 2.5px;
+  width: $secondary-size;
   height: 100%;
 }
 //Стили контейнера мерной шкалы.
@@ -18,13 +23,13 @@
   position: absolute;
   display: flex;
   left: -5px;
-  top: 2.5px;
+  top: $secondary-size;
   width: 100%;
   height: min-content;
 }
 %scale-container-vertical {
   @extend %scale-container;
-  left: 2.5px;
+  left: $secondary-size;
   top: 2.5px;
   width: min-content;
   height: 100%;
@@ -35,15 +40,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 10px;
-  height: 10px;
+  width: $handle-size;
+  height: $handle-size;
 }
 %handle-view {
   position: relative;
-  left: -5px;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
+  left: -($handle-size - ($handle-size/2));
+  width: $handle-size;
+  height: $handle-size;
+  border-radius: $handle-size/2;
   background-color: aquamarine;
   user-select: none;
   z-index: 1;
@@ -51,11 +56,11 @@
 %handle-value {
   position: absolute;
   left: -5px;
-  top: -6px;
+  top: -($font-size + 2px);
   max-width: 10px;
   width: 10px;
   height: 5px;
-  font-size: 5px;
+  font-size: $font-size;
   user-select: none;
 }
 %handle-value-text {
@@ -69,8 +74,8 @@
 }
 %handle-view-vertical {
   @extend %handle-view;
-  top: 5px;
-  left: -4.5px;
+  top: ($handle-size - ($handle-size/2));
+  left: - ($handle-size/2 - ($secondary-size/2) +1px);
 }
 %handle-value-vertical {
   @extend %handle-value;
@@ -89,15 +94,15 @@
   flex-direction: column;
 }
 %scale-mark-separator {
-  height: 5px;
-  width: 0.2px;
+  height: 15px;
+  width: 2px;
   background-color: black;
 }
 %scale-mark-value {
   max-width: 10px;
   width: 10px;
   height: 5px;
-  font-size: 5px;
+  font-size: $font-size;
   user-select: none;
 }
 %scale-mark-value-text {
@@ -126,11 +131,11 @@
 //Стили полос заполненности.
 %flip-scrip {
   position: absolute;
-  height: 1.5px;
+  height: $secondary-size - 2px;
   background: linear-gradient(270deg, blue, pink);
 }
 %flip-scrip-vertical {
   position: absolute;
-  width: 1.5px;
+  width: $secondary-size - 2px;
   background: linear-gradient(180deg, blue, pink);
 }
