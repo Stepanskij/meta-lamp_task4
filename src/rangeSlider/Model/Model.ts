@@ -27,8 +27,6 @@ class Model {
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
     this.sortBordersFillStrips(); //Сортирует массив полос заполненности.
     this.reconstructionHandlesArray(this.data.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
-    this.scaleDataMethods.fixedCustomMark();
-    this.scaleDataMethods.fixedNumberAutoMark();
     this.scaleDataMethods.makeMarkArray();
   };
   update = (newModelData?: IModelData): void => {
@@ -48,12 +46,8 @@ class Model {
         modelData.isVertical = newModelData.isVertical;
       if (newModelData.scaleData !== undefined) {
         if (modelData.scaleData === undefined) modelData.scaleData = {};
-        if (newModelData.scaleData.customMarkArray !== undefined)
-          modelData.scaleData.customMarkArray =
-            newModelData.scaleData.customMarkArray;
-        if (newModelData.scaleData.numberAutoMark !== undefined)
-          modelData.scaleData.numberAutoMark =
-            newModelData.scaleData.numberAutoMark;
+        if (newModelData.scaleData.numberGaps !== undefined)
+          modelData.scaleData.numberGaps = newModelData.scaleData.numberGaps;
       }
       if (newModelData.bordersFillStrips !== undefined)
         modelData.bordersFillStrips = newModelData.bordersFillStrips;
@@ -213,10 +207,8 @@ class Model {
       this.data.handlesCanPushed = false;
     if (this.data.isVertical === undefined) this.data.isVertical = false;
     if (this.data.scaleData === undefined) this.data.scaleData = {};
-    if (this.data.scaleData.customMarkArray === undefined)
-      this.data.scaleData.customMarkArray = [];
-    if (this.data.scaleData.numberAutoMark === undefined)
-      this.data.scaleData.numberAutoMark = 0;
+    if (this.data.scaleData.numberGaps === undefined)
+      this.data.scaleData.numberGaps = 1;
     if (this.data.bordersFillStrips === undefined)
       this.data.bordersFillStrips = [0];
     if (this.data.numberRounding === undefined) this.data.numberRounding = 0;

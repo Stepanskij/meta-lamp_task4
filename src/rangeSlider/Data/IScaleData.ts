@@ -1,6 +1,5 @@
 interface IScaleData {
-  customMarkArray?: number[];
-  numberAutoMark?: number;
+  numberGaps?: number;
   markArray?: number[];
 }
 
