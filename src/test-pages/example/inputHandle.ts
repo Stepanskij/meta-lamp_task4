@@ -9,7 +9,7 @@ class inputHandle {
     inputElement?.addEventListener("change", () => {
       this.modelData.isVertical = inputElement?.checked;
 
-      this.sliderController.remakeSlider(this.modelData);
+      /* this.sliderController.remakeSlider(this.modelData); */
     });
   };
 }

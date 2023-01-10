@@ -1,24 +1,26 @@
 import IModelData from "rangeSlider/Data/IModelData";
+import IUserModelData from "rangeSlider/Data/IUserModelData";
 import IHandles from "rangeSlider/Data/IHandles";
 import IDnDArgsUpdate from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
+import IScaleData from "rangeSlider/Data/IScaleData";
 
-import scaleDataMethods from "./modelParts/scaleDataMethods";
 import CustomEvent from "rangeSlider/Event/Event";
 import CustomEventArgs from "rangeSlider/Event/EventArgs";
 import EventArgs from "rangeSlider/Event/EventArgs";
 import IHandleMarksArgsUpdate from "rangeSlider/Data/updateArgs/IHandleMarksArgsUpdate";
 
 class Model {
-  data: IModelData = {};
-  scaleDataMethods: scaleDataMethods;
+  data: IModelData = {
+    handles: [],
+    scaleData: {},
+  };
   customEvents = {
     onUpdate: new CustomEvent<IModelData>(),
   };
 
-  constructor(data?: IModelData) {
-    if (data) this.data = data;
+  constructor(private userData?: IUserModelData) {
+    if (this.userData) this.putUserData(this.userData); //Положить данные из userData в modelData.
     this.makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
-    this.scaleDataMethods = new scaleDataMethods(this.data); //Записывает методы работы над свойстом scaleData объекта data.
   }
 
   loadContent = () => {
@@ -27,7 +29,7 @@ class Model {
     this.getMaxSteps(); //Расчитывает колличество делений ролика.
     this.sortBordersFillStrips(); //Сортирует массив полос заполненности.
     this.reconstructionHandlesArray(this.data.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
-    this.scaleDataMethods.makeMarkArray();
+    this.makeMarkArray();
   };
   update = (newModelData?: IModelData): void => {
     const modelData = this.data;
@@ -197,12 +199,89 @@ class Model {
       });
     }
   };
+  //Создание массива меток мерной шкалы.
+  private makeMarkArray = (): void => {
+    if (this.data.scaleData) {
+      this.data.scaleData.markArray = [];
+      //Запись возможных марок в массив.
+      if (
+        this.data.scaleData.numberGaps &&
+        this.data.minValue !== undefined &&
+        this.data.maxValue !== undefined &&
+        this.data.maxSteps !== undefined &&
+        this.data.stepSize !== undefined
+      ) {
+        if (this.data.scaleData.numberGaps > 0) {
+          this.data.scaleData.markArray?.push(this.data.minValue);
+          this.data.scaleData.markArray?.push(this.data.maxValue);
+        }
+        if (this.data.scaleData.numberGaps > 1) {
+          for (let i = 1; i <= this.data.scaleData.numberGaps - 1; i++) {
+            const newMarkStep = Math.round(
+              this.data.maxSteps * (i / this.data.scaleData.numberGaps)
+            );
+            this.data.scaleData.markArray?.push(
+              this.data.minValue + newMarkStep * this.data.stepSize
+            );
+          }
+        }
+      }
+      //
+      //Выкидывание, выхдящих за пределы ролика, значений.
+      this.data.scaleData.markArray = this.data.scaleData.markArray.filter(
+        (number) => {
+          return (
+            this.data.maxValue !== undefined &&
+            this.data.minValue !== undefined &&
+            !(number > this.data.maxValue || number < this.data.minValue)
+          );
+        }
+      );
+      //Выкидываем из массива повторяющиеся элементы.
+      this.data.scaleData.markArray = this.data.scaleData.markArray.filter(
+        (number, index, array) => {
+          return array.indexOf(number) === index;
+        }
+      );
+      //Сортировка значений по возростанию.
+      this.data.scaleData.markArray.sort((a, b) => {
+        return a - b;
+      });
+      //Округление значений.
+      this.data.scaleData.markArray = this.data.scaleData.markArray.map(
+        (number) => {
+          return Number(number.toFixed(this.data.numberRounding));
+        }
+      );
+    }
+  };
+  //Поместить значения из userData в modelData.
+  private putUserData = (userData: IUserModelData): void => {
+    if (userData.minValue !== undefined) this.data.minValue = userData.minValue;
+    if (userData.stepSize !== undefined) this.data.stepSize = userData.stepSize;
+    if (userData.maxValue !== undefined) this.data.maxValue = userData.maxValue;
+    if (userData.handles !== undefined)
+      this.data.handles = userData.handles.map((valueHandle) => {
+        return { value: valueHandle };
+      });
+    if (userData.handlesCanPushed !== undefined)
+      this.data.handlesCanPushed = userData.handlesCanPushed;
+    if (userData.isVertical !== undefined)
+      this.data.isVertical = userData.isVertical;
+    if (userData.bordersFillStrips !== undefined)
+      this.data.bordersFillStrips = userData.bordersFillStrips;
+    if (userData.numberGaps !== undefined)
+      (this.data.scaleData as IScaleData).numberGaps = userData.numberGaps;
+    if (userData.numberRounding !== undefined)
+      this.data.numberRounding = userData.numberRounding;
+  };
   //Задать значения свойствам модели, если те не были переданы User-ом.
   private makeDefaultModelValues = (): void => {
     if (this.data.minValue === undefined) this.data.minValue = -10;
     if (this.data.stepSize === undefined) this.data.stepSize = 1;
     if (this.data.maxValue === undefined) this.data.maxValue = 10;
-    if (this.data.handles === undefined) this.data.handles = [{ value: 0 }];
+    if (this.data.handles === undefined || this.data.handles.length === 0)
+      this.data.handles = [{ value: 0 }];
     if (this.data.handlesCanPushed === undefined)
       this.data.handlesCanPushed = false;
     if (this.data.isVertical === undefined) this.data.isVertical = false;

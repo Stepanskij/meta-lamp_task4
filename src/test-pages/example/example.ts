@@ -1,17 +1,15 @@
 import "./example.scss";
 
 import IDOMsOfInputs from "./IDOMsOfInputs";
+import IUserModelData from "rangeSlider/Data/IUserModelData";
 
 import Controller from "rangeSlider/Controller/Controller";
-import IModelData from "rangeSlider/Data/IModelData";
 
-const userSliderData: IModelData = {
+const userSliderData: IUserModelData = {
   maxValue: 100,
   minValue: -100.78,
   stepSize: 5,
-  scaleData: {
-    numberGaps: 3,
-  },
+  numberGaps: 3,
   isVertical: true,
 };
 
