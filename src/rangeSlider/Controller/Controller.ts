@@ -32,10 +32,47 @@ class Controller {
     this.model.customEvents.onUpdate.subscribe(this.view.renderView);
   };
 
+  addHandle = (valueHandle?: number): void => {
+    this.model.addHandle(valueHandle);
+    this.remakeSlider();
+  };
+  removeHandle = (): void => {
+    this.model.removeHandle();
+    this.remakeSlider();
+  };
+  //Получить значение рычажка(по его номеру в массиве).
+  getHandleValue = (numberHandle: number): number | undefined => {
+    if (
+      this.model.data.handles &&
+      numberHandle < this.model.data.handles.length &&
+      numberHandle >= 0
+    )
+      return this.model.data.handles[numberHandle].value;
+  };
+  //Установить новое значение рычажка(по его номеру в массиве).
+  setHandleValue = (numberHandle: number, valueHandle: number): void => {
+    if (
+      this.model.data.handles &&
+      numberHandle < this.model.data.handles.length &&
+      numberHandle >= 0
+    ) {
+      this.model.data.handles[numberHandle].value = valueHandle;
+      this.model.data.handles.forEach((handleObj, index) => {
+        if (index > numberHandle) {
+          if (handleObj.value < valueHandle) handleObj.value = valueHandle;
+        }
+        if (index < numberHandle) {
+          if (handleObj.value > valueHandle) handleObj.value = valueHandle;
+        }
+      });
+    }
+    this.remakeSlider();
+  };
+
   remakeSlider = (userModelData?: IUserModelData): void => {
     if (userModelData) {
-      this.model = new Model(userModelData);
-    } else this.model = new Model();
+      this.model.putUserData(userModelData);
+    }
     this.view = new View();
     this.DOMDiv.innerHTML = "";
     this.loadContent();

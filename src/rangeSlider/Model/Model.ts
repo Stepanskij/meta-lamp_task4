@@ -256,7 +256,7 @@ class Model {
     }
   };
   //Поместить значения из userData в modelData.
-  private putUserData = (userData: IUserModelData): void => {
+  putUserData = (userData: IUserModelData): void => {
     if (userData.minValue !== undefined) this.data.minValue = userData.minValue;
     if (userData.stepSize !== undefined) this.data.stepSize = userData.stepSize;
     if (userData.maxValue !== undefined) this.data.maxValue = userData.maxValue;

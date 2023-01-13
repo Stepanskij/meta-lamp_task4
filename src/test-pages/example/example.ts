@@ -4,13 +4,16 @@ import IDOMsOfInputs from "./IDOMsOfInputs";
 import IUserModelData from "rangeSlider/Data/IUserModelData";
 
 import Controller from "rangeSlider/Controller/Controller";
+import inputsHandle from "./inputsHandle";
 
 const userSliderData: IUserModelData = {
   maxValue: 100,
-  minValue: -100.78,
+  minValue: -100,
   stepSize: 5,
   numberGaps: 3,
   isVertical: true,
+  handlesCanPushed: true,
+  handles: [-12, 30],
 };
 
 const DOMTestSlider1: HTMLDivElement | null =
@@ -42,23 +45,12 @@ const DOMsInputs: IDOMsOfInputs = {};
   DOMsInputs.InputStepSize = document.querySelector(
     ".example__input-step-size"
   ) as HTMLInputElement;
-  DOMsInputs.InputMaxSteps = document.querySelector(
-    ".example__input-max-steps"
-  ) as HTMLInputElement;
-  DOMsInputs.InputNumberAutoMark = document.querySelector(
-    ".example__input-number-auto-mark"
-  ) as HTMLInputElement;
   //
   DOMsInputs.InputsHandles = document.querySelector(
     ".example__input-handles"
   ) as HTMLInputElement;
-  DOMsInputs.InputsCustomMarkArray = document.querySelector(
-    ".example__input-custom-mark-array"
-  ) as HTMLInputElement;
-  DOMsInputs.InputsBordersFillStrips = document.querySelector(
-    ".example__input-borders-fill-strips"
-  ) as HTMLInputElement;
 }
+const handleOfInputs = new inputsHandle(slider1, DOMsInputs);
 //
 
 export {};

@@ -11,4 +11,25 @@
     border-radius: 5px;
     border-color: black;
   }
+
+  &__input {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 100px 300px;
+    row-gap: 10px;
+    column-gap: 20px;
+    margin-top: 20px;
+    border: solid 1px;
+    border-radius: 5px;
+    border-color: black;
+    > :nth-child(2n-1) {
+      max-height: 20px;
+      border: solid 1px;
+      border-radius: 5px;
+      border-color: black;
+    }
+    > :nth-child(2n) {
+      font-size: 20px;
+    }
+  }
 }
