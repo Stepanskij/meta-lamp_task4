@@ -20,63 +20,58 @@ class Controller {
     this.view = new View();
 
     this.loadContent();
-
-    this.view.makeSlider(this.DOMDiv, { ...this.model.data });
+    this.view.build({ DOMContainer: this.DOMDiv });
     this.view.renderView(new EventArgs({ ...this.model.data }));
   }
 
-  loadContent = (): void => {
+  loadContent = () => {
     this.model.loadContent();
-    this.view.customEvents.onMouseMove.subscribe(this.model.DaDModelUpdate);
-    this.view.customEvents.onMouseClick.subscribe(this.model.markerModelUpdate);
+    this.view.loadContent({
+      view: this.view,
+      modelData: { ...this.model.data },
+    });
+    this.view.customEvents.onHandleMove.subscribe(this.model.DaDModelUpdate);
+    this.view.customEvents.onScaleClick.subscribe(this.model.markerModelUpdate);
+    this.view.customEvents.onRollerClick.subscribe(
+      this.model.rollerModelUpdate
+    );
     this.model.customEvents.onUpdate.subscribe(this.view.renderView);
   };
 
-  addHandle = (valueHandle?: number): void => {
+  addHandle = (valueHandle?: number) => {
     this.model.addHandle(valueHandle);
     this.remakeSlider();
   };
-  removeHandle = (): void => {
+
+  removeHandle = () => {
     this.model.removeHandle();
     this.remakeSlider();
   };
+
   //Получить значение рычажка(по его номеру в массиве).
   getHandleValue = (numberHandle: number): number | undefined => {
-    if (
-      this.model.data.handles &&
-      numberHandle < this.model.data.handles.length &&
-      numberHandle >= 0
-    )
-      return this.model.data.handles[numberHandle].value;
+    return this.model.getHandleValue(numberHandle);
   };
+
   //Установить новое значение рычажка(по его номеру в массиве).
-  setHandleValue = (numberHandle: number, valueHandle: number): void => {
-    if (
-      this.model.data.handles &&
-      numberHandle < this.model.data.handles.length &&
-      numberHandle >= 0
-    ) {
-      this.model.data.handles[numberHandle].value = valueHandle;
-      this.model.data.handles.forEach((handleObj, index) => {
-        if (index > numberHandle) {
-          if (handleObj.value < valueHandle) handleObj.value = valueHandle;
-        }
-        if (index < numberHandle) {
-          if (handleObj.value > valueHandle) handleObj.value = valueHandle;
-        }
-      });
-    }
+  setHandleValue = (numberHandle: number, valueHandle: number) => {
+    this.model.setHandleValue(numberHandle, valueHandle);
     this.remakeSlider();
   };
 
-  remakeSlider = (userModelData?: IUserModelData): void => {
+  remakeSlider = (userModelData?: IUserModelData) => {
     if (userModelData) {
       this.model.putUserData(userModelData);
     }
-    this.view = new View();
+
     this.DOMDiv.innerHTML = "";
-    this.loadContent();
-    this.view.makeSlider(this.DOMDiv, { ...this.model.data });
+    this.model.loadContent();
+    /* this.view.data = {
+      DOMsSliderHandles: [],
+      DOMsScaleMarkers: [],
+      DOMsFillStrips: [],
+    }; */
+    this.view.build({ DOMContainer: this.DOMDiv });
     this.view.renderView(new EventArgs({ ...this.model.data }));
   };
 }

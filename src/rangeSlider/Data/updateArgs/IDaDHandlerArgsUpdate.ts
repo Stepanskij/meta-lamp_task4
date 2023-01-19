@@ -3,7 +3,7 @@ interface IDnDArgsUpdate {
   rollerHeight: number;
   rollerPageX: number;
   rollerPageY: number;
-  eventElementIndex: number;
+  eventElementId: number;
   rightShiftX: number;
   upShiftY: number;
 }

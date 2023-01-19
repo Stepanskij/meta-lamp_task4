@@ -1,13 +1,14 @@
-import IModelData from "rangeSlider/Data/IModelData";
-import IUserModelData from "rangeSlider/Data/IUserModelData";
-import IHandles from "rangeSlider/Data/IHandles";
-import IDnDArgsUpdate from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
-import IScaleData from "rangeSlider/Data/IScaleData";
-
 import CustomEvent from "rangeSlider/Event/Event";
 import CustomEventArgs from "rangeSlider/Event/EventArgs";
 import EventArgs from "rangeSlider/Event/EventArgs";
-import IHandleMarksArgsUpdate from "rangeSlider/Data/updateArgs/IHandleMarksArgsUpdate";
+
+import IModelData from "rangeSlider/Data/IModelData";
+import IUserModelData from "rangeSlider/Data/IUserModelData";
+import IHandles from "rangeSlider/Data/IHandles";
+import IDnDArgsUpdate from "rangeSlider/Data/updateArgs/IDaDHandlerArgsUpdate";
+import IScaleData from "rangeSlider/Data/IScaleData";
+import IScaleMarkHandlerArgsUpdate from "rangeSlider/Data/updateArgs/IScaleMarkHandlerArgsUpdate";
+import IRollerHandlerArgsUpdate from "rangeSlider/Data/updateArgs/IRollerHandlerArgsUpdate";
 
 class Model {
   data: IModelData = {
@@ -31,7 +32,7 @@ class Model {
     this.reconstructionHandlesArray(this.data.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
     this.makeMarkArray();
   };
-  update = (newModelData?: IModelData): void => {
+  update = (newModelData?: IModelData) => {
     const modelData = this.data;
     if (newModelData) {
       if (newModelData.minValue !== undefined)
@@ -51,8 +52,8 @@ class Model {
         if (newModelData.scaleData.numberGaps !== undefined)
           modelData.scaleData.numberGaps = newModelData.scaleData.numberGaps;
       }
-      if (newModelData.bordersFillStrips !== undefined)
-        modelData.bordersFillStrips = newModelData.bordersFillStrips;
+      if (newModelData.idsFillStrip !== undefined)
+        modelData.idsFillStrip = newModelData.idsFillStrip;
       if (newModelData.numberRounding !== undefined)
         modelData.numberRounding = newModelData.numberRounding;
     }
@@ -60,16 +61,16 @@ class Model {
     this.customEvents.onUpdate.dispatch(new EventArgs({ ...this.data }));
   };
   //Создание массива рычажков при создании класса Model.
-  private reconstructionHandlesArray = (handlesArray: IHandles[]): void => {
+  private reconstructionHandlesArray = (handlesArray: IHandles[]) => {
     const handles = handlesArray;
     this.data.handles = [];
 
-    handles.forEach((handleObj): void => {
+    handles.forEach((handleObj) => {
       this.addHandle(handleObj.value);
     });
   };
   //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
-  addHandle = (value?: number): void => {
+  addHandle = (value?: number) => {
     if (
       this.data.minValue !== undefined &&
       this.data.maxValue !== undefined &&
@@ -116,11 +117,11 @@ class Model {
     }
   };
   //Убрать крайний рычажок (последний, из массива).
-  removeHandle = (): void => {
+  removeHandle = () => {
     this.data.handles?.pop();
   };
   //Расчёт количества шагов (делений) слайдера.
-  private getMaxSteps = (): void => {
+  private getMaxSteps = () => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -132,7 +133,7 @@ class Model {
     }
   };
   //Расчёт количества цифр после запятой.
-  private getNumberRounding = (): void => {
+  private getNumberRounding = () => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -152,7 +153,7 @@ class Model {
     }
   };
   //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
-  private fixMaxValue = (): void => {
+  private fixMaxValue = () => {
     if (
       this.data.maxValue !== undefined &&
       this.data.minValue !== undefined &&
@@ -174,33 +175,31 @@ class Model {
         );
     }
   };
-  //Сортировать массив bordersFillStrips на некорректные значения.
-  private sortBordersFillStrips = (): void => {
-    if (this.data.bordersFillStrips) {
+  //Сортировать массив idsFillStrip на некорректные значения.
+  private sortBordersFillStrips = () => {
+    if (this.data.idsFillStrip) {
       //Округляем выходящие за пределы ролика значения.
-      this.data.bordersFillStrips = this.data.bordersFillStrips.map(
-        (number): number => {
-          let leftBorder = number;
-          if (leftBorder > (this.data.handles as IHandles[]).length)
-            leftBorder = (this.data.handles as IHandles[]).length;
-          if (leftBorder < 0) leftBorder = 0;
-          return leftBorder;
-        }
-      );
+      this.data.idsFillStrip = this.data.idsFillStrip.map((number): number => {
+        let leftBorder = number;
+        if (leftBorder > (this.data.handles as IHandles[]).length)
+          leftBorder = (this.data.handles as IHandles[]).length;
+        if (leftBorder < 0) leftBorder = 0;
+        return leftBorder;
+      });
       //Выкидываем из массива повторяющиеся элементы.
-      this.data.bordersFillStrips = this.data.bordersFillStrips.filter(
+      this.data.idsFillStrip = this.data.idsFillStrip.filter(
         (number, index, array) => {
           return array.indexOf(number) === index;
         }
       );
       //сортировка по возростанию.
-      this.data.bordersFillStrips = this.data.bordersFillStrips.sort((a, b) => {
+      this.data.idsFillStrip = this.data.idsFillStrip.sort((a, b) => {
         return a - b;
       });
     }
   };
   //Создание массива меток мерной шкалы.
-  private makeMarkArray = (): void => {
+  private makeMarkArray = () => {
     if (this.data.scaleData) {
       this.data.scaleData.markArray = [];
       //Запись возможных марок в массив.
@@ -256,7 +255,7 @@ class Model {
     }
   };
   //Поместить значения из userData в modelData.
-  putUserData = (userData: IUserModelData): void => {
+  putUserData = (userData: IUserModelData) => {
     if (userData.minValue !== undefined) this.data.minValue = userData.minValue;
     if (userData.stepSize !== undefined) this.data.stepSize = userData.stepSize;
     if (userData.maxValue !== undefined) this.data.maxValue = userData.maxValue;
@@ -268,15 +267,15 @@ class Model {
       this.data.handlesCanPushed = userData.handlesCanPushed;
     if (userData.isVertical !== undefined)
       this.data.isVertical = userData.isVertical;
-    if (userData.bordersFillStrips !== undefined)
-      this.data.bordersFillStrips = userData.bordersFillStrips;
+    if (userData.idsFillStrip !== undefined)
+      this.data.idsFillStrip = userData.idsFillStrip;
     if (userData.numberGaps !== undefined)
       (this.data.scaleData as IScaleData).numberGaps = userData.numberGaps;
     if (userData.numberRounding !== undefined)
       this.data.numberRounding = userData.numberRounding;
   };
   //Задать значения свойствам модели, если те не были переданы User-ом.
-  private makeDefaultModelValues = (): void => {
+  private makeDefaultModelValues = () => {
     if (this.data.minValue === undefined) this.data.minValue = -10;
     if (this.data.stepSize === undefined) this.data.stepSize = 1;
     if (this.data.maxValue === undefined) this.data.maxValue = 10;
@@ -288,12 +287,11 @@ class Model {
     if (this.data.scaleData === undefined) this.data.scaleData = {};
     if (this.data.scaleData.numberGaps === undefined)
       this.data.scaleData.numberGaps = 1;
-    if (this.data.bordersFillStrips === undefined)
-      this.data.bordersFillStrips = [0];
+    if (this.data.idsFillStrip === undefined) this.data.idsFillStrip = [0];
     if (this.data.numberRounding === undefined) this.data.numberRounding = 0;
   };
   //Изменение позиции рычажка мышью.
-  DaDModelUpdate = (handleMoveArgs?: CustomEventArgs<IDnDArgsUpdate>): void => {
+  DaDModelUpdate = (handleMoveArgs?: CustomEventArgs<IDnDArgsUpdate>) => {
     const newModelData: IModelData = {};
     if (
       handleMoveArgs &&
@@ -305,7 +303,7 @@ class Model {
       let stepNow: number = 0;
       const stepWidth = handleMoveArgs.data.rollerWidth / this.data.maxSteps;
       const stepHeight = handleMoveArgs.data.rollerHeight / this.data.maxSteps;
-      const handleIndex = handleMoveArgs.data.eventElementIndex;
+      const handleIndex = handleMoveArgs.data.eventElementId;
       const handleObjByIndex = this.data.handles[handleIndex];
 
       if (!this.data.isVertical) {
@@ -314,7 +312,6 @@ class Model {
         stepNow =
           this.data.maxSteps -
           Math.round(handleMoveArgs.data.upShiftY / stepHeight);
-
       if (handleObjByIndex) {
         //Невозможность перескочить соседние рычажки (когда отсутствует толкание).
         if (!this.data.handlesCanPushed && this.data.handles) {
@@ -383,8 +380,9 @@ class Model {
     }
     this.update(newModelData);
   };
+
   markerModelUpdate = (
-    handleMoveArgs?: CustomEventArgs<IHandleMarksArgsUpdate>
+    handleMoveArgs?: CustomEventArgs<IScaleMarkHandlerArgsUpdate>
   ) => {
     const newModelData: IModelData = {};
     let newHandlesArr: IHandles[] = [...(this.data.handles as IHandles[])];
@@ -405,6 +403,68 @@ class Model {
       );
       newModelData.handles = newHandlesArr;
       this.update(newModelData);
+    }
+  };
+
+  rollerModelUpdate = (
+    rollerClickArgs?: CustomEventArgs<IRollerHandlerArgsUpdate>
+  ) => {
+    const newModelData: IModelData = {};
+    let newHandlesArr: IHandles[] = [...(this.data.handles as IHandles[])];
+    let nearestStep: number = 0;
+
+    if (rollerClickArgs && this.data.maxSteps) {
+      const stepWidth = rollerClickArgs.data.rollerWidth / this.data.maxSteps;
+      const stepHeight = rollerClickArgs.data.rollerHeight / this.data.maxSteps;
+      if (!this.data.isVertical) {
+        nearestStep = Math.round(rollerClickArgs.data.rightShiftX / stepWidth);
+      } else if (this.data.maxSteps)
+        nearestStep =
+          this.data.maxSteps -
+          Math.round(rollerClickArgs.data.upShiftY / stepHeight);
+    }
+    if (this.data.minValue && this.data.stepSize) {
+      let arrAbs: Array<number>;
+      arrAbs = (newHandlesArr as IHandles[]).map((handleObj) => {
+        return Math.abs((handleObj.step as number) - nearestStep);
+      });
+      const minHandleIndex = arrAbs.indexOf(Math.min(...arrAbs)); //Индекс ближайшего к маркеру рычажка.
+      newHandlesArr[minHandleIndex].step = nearestStep;
+      newHandlesArr[minHandleIndex].value = Number(
+        (this.data.minValue + nearestStep * this.data.stepSize).toFixed(
+          this.data.numberRounding
+        )
+      );
+      newModelData.handles = newHandlesArr;
+    }
+    this.update(newModelData);
+  };
+
+  //
+  getHandleValue = (numberHandle: number): number | undefined => {
+    if (
+      this.data.handles &&
+      numberHandle < this.data.handles.length &&
+      numberHandle >= 0
+    )
+      return this.data.handles[numberHandle].value;
+  };
+
+  setHandleValue = (numberHandle: number, valueHandle: number) => {
+    if (
+      this.data.handles &&
+      numberHandle < this.data.handles.length &&
+      numberHandle >= 0
+    ) {
+      this.data.handles[numberHandle].value = valueHandle;
+      this.data.handles.forEach((handleObj, index) => {
+        if (index > numberHandle) {
+          if (handleObj.value < valueHandle) handleObj.value = valueHandle;
+        }
+        if (index < numberHandle) {
+          if (handleObj.value > valueHandle) handleObj.value = valueHandle;
+        }
+      });
     }
   };
 }

@@ -11,7 +11,7 @@ interface IModelData {
   handlesCanPushed?: boolean;
   isVertical?: boolean;
   scaleData?: IScaleData;
-  bordersFillStrips?: number[];
+  idsFillStrip?: number[];
 }
 
 export default IModelData;

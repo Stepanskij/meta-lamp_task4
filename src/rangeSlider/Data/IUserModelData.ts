@@ -8,7 +8,7 @@ interface IUserModelData {
   handlesCanPushed?: boolean;
   isVertical?: boolean;
   numberGaps?: number;
-  bordersFillStrips?: number[];
+  idsFillStrip?: number[];
 }
 
 export default IUserModelData;

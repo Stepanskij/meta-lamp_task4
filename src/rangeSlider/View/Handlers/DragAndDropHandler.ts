@@ -1,48 +1,49 @@
 import View from "../View";
 import EventArgs from "rangeSlider/Event/EventArgs";
+import Handle from "../Parts/Handle";
+import Roller from "../Parts/Roller";
 
-import IDOMsSliderHandle from "rangeSlider/Data/DOMsData/IDOMsSliderHandle";
-import IHandleMouseMove from "rangeSlider/Data/updateArgs/IDaDArgsUpdate";
+import IHandleMouseMove from "rangeSlider/Data/updateArgs/IDaDHandlerArgsUpdate";
 
-class HandleDragAndDrop {
+class DragAndDropHandler {
   private DaDArgs: IHandleMouseMove = {
     rollerWidth: 0,
     rollerHeight: 0,
     rollerPageX: 0,
     rollerPageY: 0,
-    eventElementIndex: 0,
+    eventElementId: 0,
     rightShiftX: 0,
     upShiftY: 0,
   };
+  view: View;
+  handlePart: Handle;
+  sliderRoller: Roller;
+  DOMSliderRoller: HTMLDivElement | undefined;
 
-  constructor(public view: View) {}
+  constructor({
+    view,
+    handlePart,
+    sliderRoller,
+  }: {
+    view: View;
+    handlePart: Handle;
+    sliderRoller: Roller;
+  }) {
+    this.view = view;
+    this.handlePart = handlePart;
+    this.sliderRoller = sliderRoller;
+  }
 
-  addEvent = (DOMsHandle: IDOMsSliderHandle): void => {
-    if (DOMsHandle.DOMHandleView) {
-      DOMsHandle.DOMHandleView.addEventListener(
-        "mousedown",
-        this.handleMouseDown
-      );
-      DOMsHandle.DOMHandleView.addEventListener(
-        "touchstart",
-        this.handleMouseDown
-      );
-    }
+  addEvent = (DOMHandleView: HTMLDivElement) => {
+    DOMHandleView.addEventListener("mousedown", this.handleMouseDown);
+    DOMHandleView.addEventListener("touchstart", this.handleMouseDown);
   };
-  removeEvent = (DOMsHandle: IDOMsSliderHandle): void => {
-    if (DOMsHandle.DOMHandleView) {
-      DOMsHandle.DOMHandleView.removeEventListener(
-        "mousedown",
-        this.handleMouseDown
-      );
-      DOMsHandle.DOMHandleView.removeEventListener(
-        "touchstart",
-        this.handleMouseDown
-      );
-    }
+  removeEvent = (DOMHandleView: HTMLDivElement) => {
+    DOMHandleView.removeEventListener("mousedown", this.handleMouseDown);
+    DOMHandleView.removeEventListener("touchstart", this.handleMouseDown);
   };
 
-  private handleMouseDown = (eventDown: UIEvent): void => {
+  private handleMouseDown = (eventDown: UIEvent) => {
     //Запоминаем объект event.
     let eventClick;
     if (eventDown instanceof TouchEvent) {
@@ -54,21 +55,21 @@ class HandleDragAndDrop {
     this.DaDArgs.rightShiftX = 0;
     this.DaDArgs.upShiftY = 0;
     //Запоминание неизменных свойств при клике на рычажок.
-    if (eventClick && this.view.data.DOMSliderRoller) {
+    if (eventClick && this.sliderRoller.DOMRoot) {
       const eventElement = eventClick.target as HTMLDivElement; //view-элемент рычажка.
-      this.DaDArgs.eventElementIndex = Number(eventElement.dataset.index); //Получение индекса рычажка.
+      this.DaDArgs.eventElementId = Number(eventElement.dataset.id); //Получение id рычажка.
       this.DaDArgs.rollerWidth =
-        this.view.data.DOMSliderRoller.offsetWidth -
-        this.view.data.DOMSliderRoller.clientLeft * 2; //Ширина ролика при клике, px.
+        this.sliderRoller.DOMRoot.offsetWidth -
+        this.sliderRoller.DOMRoot.clientLeft * 2; //Ширина ролика при клике, px.
       this.DaDArgs.rollerHeight =
-        this.view.data.DOMSliderRoller.offsetHeight -
-        this.view.data.DOMSliderRoller.clientTop * 2; //Высота ролика при клике, px.
+        this.sliderRoller.DOMRoot.offsetHeight -
+        this.sliderRoller.DOMRoot.clientTop * 2; //Высота ролика при клике, px.
 
       this.DaDArgs.rollerPageX = this.getPositionElement(
-        this.view.data.DOMSliderRoller
+        this.sliderRoller.DOMRoot
       ).left; //Левый отступ ролика относительно страницы.
       this.DaDArgs.rollerPageY = this.getPositionElement(
-        this.view.data.DOMSliderRoller
+        this.sliderRoller.DOMRoot
       ).top; //Верхний отступ ролика относительно страницы.
     }
     //
@@ -77,7 +78,7 @@ class HandleDragAndDrop {
     document.addEventListener("mouseup", this.handleMouseUp);
     document.addEventListener("touchend", this.handleMouseUp);
   };
-  private handleMouseMove = (eventMove: UIEvent): void => {
+  private handleMouseMove = (eventMove: UIEvent) => {
     let pageX: number = 0;
     let pageY: number = 0;
     if (eventMove instanceof TouchEvent) {
@@ -91,12 +92,12 @@ class HandleDragAndDrop {
     this.DaDArgs.rightShiftX = pageX - this.DaDArgs.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
     this.DaDArgs.upShiftY = pageY - this.DaDArgs.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
     //Запуск методов, что выполняются при движении рычажка.
-    this.view.customEvents.onMouseMove.dispatch(
+    this.view.customEvents.onHandleMove.dispatch(
       new EventArgs({ ...this.DaDArgs })
     );
   };
   //Снимает ивенты движения и отжатия мыши/пальца с рычажка.
-  private handleMouseUp = (): void => {
+  private handleMouseUp = () => {
     document.removeEventListener("mousemove", this.handleMouseMove);
     document.removeEventListener("mouseup", this.handleMouseUp);
   };
@@ -109,10 +110,8 @@ class HandleDragAndDrop {
     const scrollTop = document.body.scrollTop; //Прокрученная часть страницы по вертикали, px.
     const scrollLeft = document.body.scrollLeft; //Прокрученная часть страницы по горизонтали, px.
 
-    const clientTop = (this.view.data.DOMSliderRoller as HTMLDivElement)
-      .clientTop; //Ширина border сверху, px.
-    const clientLeft = (this.view.data.DOMSliderRoller as HTMLDivElement)
-      .clientLeft; //Ширина border слева, px.
+    const clientTop = (this.sliderRoller.DOMRoot as HTMLDivElement).clientTop; //Ширина border сверху, px.
+    const clientLeft = (this.sliderRoller.DOMRoot as HTMLDivElement).clientLeft; //Ширина border слева, px.
 
     const top = elementObj.top + scrollTop - clientTop;
     const left = elementObj.left + scrollLeft - clientLeft;
@@ -121,4 +120,4 @@ class HandleDragAndDrop {
   };
 }
 
-export default HandleDragAndDrop;
+export default DragAndDropHandler;
