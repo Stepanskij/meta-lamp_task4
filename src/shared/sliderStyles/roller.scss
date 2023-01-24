@@ -1,0 +1,17 @@
+@import "./sliderPartsStyleArguments.scss";
+
+.roller {
+  position: absolute;
+  width: 100%;
+  height: $secondary-size;
+  background-color: white;
+  border: $border-size solid black;
+}
+
+.range-slider_vertical  .roller {
+  position: absolute;
+  width: $secondary-size;
+  height: 100%;
+  background-color: white;
+  border: $border-size solid black;
+}

@@ -1,86 +1,16 @@
-@import "./sliderPartsStyle.scss";
+@import "../base.scss";
+@import "./fillStrip.scss";
+@import "./handle.scss";
+@import "./roller.scss";
+@import "./scaleMarker.scss";
 
 .range-slider {
   position: relative;
   width: 100%;
-  height: 100%;
-  //Стили ролика.
-  &__slider-roller {
-    @extend %slider-roller;
-  }
-  &_vertical &__slider-roller {
-    @extend %slider-roller-vertical;
-  }
-  //Стили контейнера мерной шкалы.
-  &__scale-container {
-    @extend %scale-container;
-  }
-  &_vertical &__scale-container {
-    @extend %scale-container-vertical;
-  }
-  //Стили меток мерной шкалы.
-  &__scale-mark {
-    &-container {
-      @extend %scale-mark-container;
-    }
-    &-separator {
-      @extend %scale-mark-separator;
-    }
-    &-value {
-      @extend %scale-mark-value;
-      &-text {
-        @extend %scale-mark-value-text;
-      }
-    }
-  }
-  &_vertical &__scale-mark {
-    &-container {
-      @extend %scale-mark-container-vertical;
-    }
-    &-separator {
-      @extend %scale-mark-separator-vertical;
-    }
-    &-value {
-      @extend %scale-mark-value-vertical;
-      &-text {
-        @extend %scale-mark-value-text-vertical;
-      }
-    }
-  }
-  //Стили рычажков.
-  &__handle {
-    &-container {
-      @extend %handle-container;
-    }
-    &-view {
-      @extend %handle-view;
-    }
-    &-value {
-      @extend %handle-value;
-      &-text {
-        @extend %handle-value-text;
-      }
-    }
-  }
-  &_vertical &__handle {
-    &-container {
-      @extend %handle-container-vertical;
-    }
-    &-view {
-      @extend %handle-view-vertical;
-    }
-    &-value {
-      @extend %handle-value-vertical;
-      &-text {
-        @extend %handle-value-text-vertical;
-      }
-    }
-  }
-  //Стили полос заполненности.
-  &__flip-scrip {
-    @extend %flip-scrip;
-  }
-  &_vertical &__flip-scrip {
-    @extend %flip-scrip-vertical;
+  height: auto;
+
+  &_vertical {
+    width: auto;
+    height: 100%;
   }
 }

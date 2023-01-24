@@ -2,7 +2,6 @@ import Model from "rangeSlider/Model/Model";
 import View from "rangeSlider/View/View";
 import EventArgs from "rangeSlider/Event/EventArgs";
 
-import IModelData from "rangeSlider/Data/IModelData";
 import IUserModelData from "rangeSlider/Data/IUserModelData";
 
 class Controller {

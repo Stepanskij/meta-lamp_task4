@@ -8,7 +8,7 @@ import { IViewPart } from "./IViewPart";
 class FillStrip implements IViewPart {
   view: View;
   DOMRoot: HTMLDivElement | undefined;
-  sliderRoller: Roller;
+  roller: Roller;
   private id: number;
   private styleLeft: number = 0;
   private styleWidth: number = 100;
@@ -17,24 +17,25 @@ class FillStrip implements IViewPart {
   constructor({
     view,
     id,
-    sliderRoller,
+    roller,
   }: {
     view: View;
     id: number;
-    sliderRoller: Roller;
+    roller: Roller;
   }) {
     this.view = view;
     this.id = id;
-    this.sliderRoller = sliderRoller;
+    this.roller = roller;
     this.fillStripHandler = new FillStripHandler({
       view,
-      rollerPart: this.sliderRoller,
+      rollerPart: this.roller,
     });
   }
 
   build = ({ DOMContainer }: { DOMContainer: HTMLDivElement }) => {
     const DOMFillStrip = document.createElement("div");
-    DOMFillStrip.className = "range-slider__flip-scrip";
+    DOMFillStrip.className = "fill-strip";
+    DOMFillStrip.dataset.id = `${this.id}`;
     //
     DOMContainer.insertAdjacentElement("beforeend", DOMFillStrip);
     //
@@ -67,16 +68,29 @@ class FillStrip implements IViewPart {
   };
 
   render = ({ modelData }: { modelData: IModelData }) => {
+    const DOMRoller = this.roller.DOMRoot as HTMLDivElement;
+
+    const clientTop = DOMRoller.clientTop;
+    const clientLeft = DOMRoller.clientLeft;
+
     if (this.DOMRoot)
       if (!modelData.isVertical) {
         this.DOMRoot.setAttribute(
           "style",
-          `width:${this.styleWidth}%; left:${this.styleLeft}%`
+          `width:calc(${this.styleWidth}% - ${clientLeft * 2}px); left:calc(${
+            this.styleLeft
+          }% + ${clientLeft}px); height:${
+            DOMRoller.offsetHeight - clientTop * 2
+          }px; top:${clientTop}px`
         );
       } else {
         this.DOMRoot.setAttribute(
           "style",
-          `height:${this.styleWidth}%; bottom:${this.styleLeft}%`
+          `height:calc(${this.styleWidth}% - ${clientTop * 2}px); bottom:calc(${
+            this.styleLeft
+          }% + ${clientTop}px); width:${
+            DOMRoller.offsetWidth - clientLeft * 2
+          }px; left:${clientLeft}px`
         );
       }
   };

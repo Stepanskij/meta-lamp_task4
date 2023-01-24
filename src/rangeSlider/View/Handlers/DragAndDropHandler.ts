@@ -17,30 +17,30 @@ class DragAndDropHandler {
   };
   view: View;
   handlePart: Handle;
-  sliderRoller: Roller;
-  DOMSliderRoller: HTMLDivElement | undefined;
+  roller: Roller;
+  DOMRoller: HTMLDivElement | undefined;
 
   constructor({
     view,
     handlePart,
-    sliderRoller,
+    roller,
   }: {
     view: View;
     handlePart: Handle;
-    sliderRoller: Roller;
+    roller: Roller;
   }) {
     this.view = view;
     this.handlePart = handlePart;
-    this.sliderRoller = sliderRoller;
+    this.roller = roller;
   }
 
-  addEvent = (DOMHandleView: HTMLDivElement) => {
-    DOMHandleView.addEventListener("mousedown", this.handleMouseDown);
-    DOMHandleView.addEventListener("touchstart", this.handleMouseDown);
+  addEvent = (DOMHandle: HTMLDivElement) => {
+    DOMHandle.addEventListener("mousedown", this.handleMouseDown);
+    DOMHandle.addEventListener("touchstart", this.handleMouseDown);
   };
-  removeEvent = (DOMHandleView: HTMLDivElement) => {
-    DOMHandleView.removeEventListener("mousedown", this.handleMouseDown);
-    DOMHandleView.removeEventListener("touchstart", this.handleMouseDown);
+  removeEvent = (DOMHandle: HTMLDivElement) => {
+    DOMHandle.removeEventListener("mousedown", this.handleMouseDown);
+    DOMHandle.removeEventListener("touchstart", this.handleMouseDown);
   };
 
   private handleMouseDown = (eventDown: UIEvent) => {
@@ -55,23 +55,24 @@ class DragAndDropHandler {
     this.DaDArgs.rightShiftX = 0;
     this.DaDArgs.upShiftY = 0;
     //Запоминание неизменных свойств при клике на рычажок.
-    if (eventClick && this.sliderRoller.DOMRoot) {
+    if (eventClick && this.roller.DOMRoot) {
       const eventElement = eventClick.target as HTMLDivElement; //view-элемент рычажка.
       this.DaDArgs.eventElementId = Number(eventElement.dataset.id); //Получение id рычажка.
       this.DaDArgs.rollerWidth =
-        this.sliderRoller.DOMRoot.offsetWidth -
-        this.sliderRoller.DOMRoot.clientLeft * 2; //Ширина ролика при клике, px.
+        this.roller.DOMRoot.offsetWidth -
+        this.roller.DOMRoot.clientLeft * 2; //Ширина ролика при клике, px.
       this.DaDArgs.rollerHeight =
-        this.sliderRoller.DOMRoot.offsetHeight -
-        this.sliderRoller.DOMRoot.clientTop * 2; //Высота ролика при клике, px.
+        this.roller.DOMRoot.offsetHeight -
+        this.roller.DOMRoot.clientTop * 2; //Высота ролика при клике, px.
 
       this.DaDArgs.rollerPageX = this.getPositionElement(
-        this.sliderRoller.DOMRoot
+        this.roller.DOMRoot
       ).left; //Левый отступ ролика относительно страницы.
       this.DaDArgs.rollerPageY = this.getPositionElement(
-        this.sliderRoller.DOMRoot
+        this.roller.DOMRoot
       ).top; //Верхний отступ ролика относительно страницы.
     }
+    console.log(this.DaDArgs.rollerPageX)
     //
     document.addEventListener("mousemove", this.handleMouseMove);
     document.addEventListener("touchmove", this.handleMouseMove);
@@ -92,6 +93,7 @@ class DragAndDropHandler {
     this.DaDArgs.rightShiftX = pageX - this.DaDArgs.rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
     this.DaDArgs.upShiftY = pageY - this.DaDArgs.rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
     //Запуск методов, что выполняются при движении рычажка.
+    
     this.view.customEvents.onHandleMove.dispatch(
       new EventArgs({ ...this.DaDArgs })
     );
@@ -110,12 +112,12 @@ class DragAndDropHandler {
     const scrollTop = document.body.scrollTop; //Прокрученная часть страницы по вертикали, px.
     const scrollLeft = document.body.scrollLeft; //Прокрученная часть страницы по горизонтали, px.
 
-    const clientTop = (this.sliderRoller.DOMRoot as HTMLDivElement).clientTop; //Ширина border сверху, px.
-    const clientLeft = (this.sliderRoller.DOMRoot as HTMLDivElement).clientLeft; //Ширина border слева, px.
+    const clientTop = (this.roller.DOMRoot as HTMLDivElement).clientTop; //Ширина border сверху, px.
+    const clientLeft = (this.roller.DOMRoot as HTMLDivElement).clientLeft; //Ширина border слева, px.
 
     const top = elementObj.top + scrollTop - clientTop;
     const left = elementObj.left + scrollLeft - clientLeft;
-
+    
     return { top: Math.round(top), left: Math.round(left) };
   };
 }

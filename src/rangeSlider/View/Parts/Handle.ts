@@ -1,7 +1,6 @@
 import View from "../View";
 import DragAndDropHandler from "../Handlers/DragAndDropHandler";
 import Roller from "./Roller";
-import FillStripHandler from "../Handlers/FillStripHandler";
 
 import IModelData from "rangeSlider/Data/IModelData";
 import { IViewPart } from "./IViewPart";
@@ -10,58 +9,47 @@ class Handle implements IViewPart {
   view: View;
   DOMRoot: HTMLDivElement | undefined;
   private id: number;
-  private sliderRoller: Roller;
+  private roller: Roller;
   private shiftLeft: number = 0;
-  fillStripHandler: FillStripHandler;
 
   public DnDHandler: DragAndDropHandler;
 
   constructor({
     view,
     id,
-    sliderRoller,
+    roller,
   }: {
     view: View;
     id: number;
-    sliderRoller: Roller;
+    roller: Roller;
   }) {
     this.view = view;
     this.id = id;
-    this.sliderRoller = sliderRoller;
+    this.roller = roller;
     this.DnDHandler = new DragAndDropHandler({
       view: this.view,
       handlePart: this,
-      sliderRoller: this.sliderRoller,
-    });
-    this.fillStripHandler = new FillStripHandler({
-      view,
-      rollerPart: this.sliderRoller,
+      roller: this.roller,
     });
   }
 
   build = ({ DOMContainer }: { DOMContainer: HTMLDivElement }) => {
     const DOMHandleContainer = document.createElement("div");
-    DOMHandleContainer.className = "range-slider__handle-container";
-
-    const DOMHandleView = document.createElement("div");
-    DOMHandleView.className = "range-slider__handle-view";
-    DOMHandleView.dataset.id = `${this.id}`;
+    DOMHandleContainer.className = "handle";
+    DOMHandleContainer.dataset.id = `${this.id}`;
 
     const DOMHandleValue = document.createElement("div");
-    DOMHandleValue.className = "range-slider__handle-value";
-
-    const DOMHandleValueText = document.createElement("div");
-    DOMHandleValueText.className = "range-slider__handle-value-text";
+    DOMHandleValue.className = "handle__tooltip";
     //
     DOMContainer.insertAdjacentElement("beforeend", DOMHandleContainer);
     DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleValue);
-    DOMHandleContainer.insertAdjacentElement("beforeend", DOMHandleView);
-    DOMHandleValue.insertAdjacentElement("beforeend", DOMHandleValueText);
     //
     this.DOMRoot = DOMHandleContainer;
   };
 
   calculateStyles = ({ modelData }: { modelData: IModelData }) => {
+    const roller = this.roller.DOMRoot as HTMLDivElement;
+
     if (modelData.handles && modelData.maxSteps) {
       this.shiftLeft =
         ((modelData.handles[this.id].step as number) / modelData.maxSteps) *
@@ -70,35 +58,57 @@ class Handle implements IViewPart {
   };
 
   render = ({ modelData }: { modelData: IModelData }) => {
+    const DOMHandle = this.DOMRoot as HTMLDivElement;
+    const DOMHandleTooltip = this.DOMRoot?.querySelector(
+      ".handle__tooltip"
+    ) as HTMLDivElement;
+    const DOMRoller = this.roller.DOMRoot as HTMLDivElement;
+
     if (modelData.handles) {
-      const handleContainer = this.DOMRoot;
-      const handleValueText = this.DOMRoot?.querySelector(
-        ".range-slider__handle-value-text"
-      );
+      DOMHandleTooltip.innerHTML = `${
+        modelData.handles[this.id].value as number
+      }`;
 
       if (!modelData.isVertical) {
-        (handleContainer as HTMLDivElement).setAttribute(
+        DOMHandle.setAttribute(
           "style",
-          `left:${this.shiftLeft}%`
+          `left:calc(${this.shiftLeft}% - ${
+            DOMHandle.offsetWidth / 2
+          }px); top:${
+            DOMRoller.offsetHeight / 2 - DOMHandle.offsetHeight / 2
+          }px`
+        );
+        //
+        DOMHandleTooltip.setAttribute(
+          "style",
+          `left:calc(50% - ${
+            DOMHandleTooltip.offsetWidth / 2
+          }px); top:calc(${-DOMHandleTooltip.offsetHeight}px)`
         );
       } else {
-        (handleContainer as HTMLDivElement).setAttribute(
+        DOMHandle.setAttribute(
           "style",
-          `bottom:${this.shiftLeft}%`
+          `bottom:calc(${this.shiftLeft}% - ${
+            DOMHandle.offsetHeight / 2
+          }px); left:${DOMRoller.offsetWidth / 2 - DOMHandle.offsetWidth / 2}px`
+        );
+        //
+        DOMHandleTooltip.setAttribute(
+          "style",
+          `left:${-DOMHandleTooltip.offsetWidth}px; top:calc(50% - ${
+            DOMHandleTooltip.offsetHeight / 2
+          }px)`
         );
       }
 
-      (handleValueText as HTMLDivElement).innerHTML = `${
+      DOMHandleTooltip.innerHTML = `${
         modelData.handles[this.id].value as number
       }`;
     }
   };
 
   loadContent = () => {
-    const DOMHandleView = this.DOMRoot?.querySelector(
-      ".range-slider__handle-view"
-    );
-    this.DnDHandler.addEvent(DOMHandleView as HTMLDivElement);
+    this.DnDHandler.addEvent(this.DOMRoot as HTMLDivElement);
   };
 }
 

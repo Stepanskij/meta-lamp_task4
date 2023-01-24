@@ -1,0 +1,10 @@
+@import "./sliderPartsStyleArguments.scss";
+
+.fill-strip {
+  position: absolute;
+  background: linear-gradient(270deg, blue, pink);
+}
+
+.range-slider_vertical > .fill-strip {
+  background: linear-gradient(180deg, blue, pink);
+}

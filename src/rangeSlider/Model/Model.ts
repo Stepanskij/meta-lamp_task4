@@ -20,17 +20,17 @@ class Model {
   };
 
   constructor(private userData?: IUserModelData) {
-    if (this.userData) this.putUserData(this.userData); //Положить данные из userData в modelData.
-    this.makeDefaultModelValues(); //Добавляет дефолтное значение значение, если то не было передано.
+    if (this.userData) this.putUserData(this.userData);
+    this.makeDefaultModelValues();
   }
 
   loadContent = () => {
-    this.fixMaxValue(); //Исправляет максимальное значение.
-    this.getNumberRounding(); //Корректирует количество значений после запятой.
-    this.getMaxSteps(); //Расчитывает колличество делений ролика.
-    this.sortBordersFillStrips(); //Сортирует массив полос заполненности.
+    this.fixMaxValue();
+    this.getNumberRounding();
+    this.getMaxSteps();
     this.reconstructionHandlesArray(this.data.handles as IHandles[]); //Переделывает массив рычажков(от меньшего к большем).
     this.makeMarkArray();
+    this.sortIdFillStrips();
   };
   update = (newModelData?: IModelData) => {
     const modelData = this.data;
@@ -60,7 +60,7 @@ class Model {
     //Запуск методов, что выполняются при обновлении модели.
     this.customEvents.onUpdate.dispatch(new EventArgs({ ...this.data }));
   };
-  //Создание массива рычажков при создании класса Model.
+  //
   private reconstructionHandlesArray = (handlesArray: IHandles[]) => {
     const handles = handlesArray;
     this.data.handles = [];
@@ -69,7 +69,7 @@ class Model {
       this.addHandle(handleObj.value);
     });
   };
-  //Добавить рычажок в конец массива. Использование value добавляет рычажок в конкретном (из возможных) месте.
+  //
   addHandle = (value?: number) => {
     if (
       this.data.minValue !== undefined &&
@@ -116,11 +116,11 @@ class Model {
       }
     }
   };
-  //Убрать крайний рычажок (последний, из массива).
+
   removeHandle = () => {
     this.data.handles?.pop();
   };
-  //Расчёт количества шагов (делений) слайдера.
+  //
   private getMaxSteps = () => {
     if (
       this.data.maxValue !== undefined &&
@@ -132,7 +132,7 @@ class Model {
       );
     }
   };
-  //Расчёт количества цифр после запятой.
+
   private getNumberRounding = () => {
     if (
       this.data.maxValue !== undefined &&
@@ -152,7 +152,7 @@ class Model {
       );
     }
   };
-  //Исправляет максимальное значение слайдера, по отношению к неизменным минимальному зачению и шагу.
+
   private fixMaxValue = () => {
     if (
       this.data.maxValue !== undefined &&
@@ -175,21 +175,17 @@ class Model {
         );
     }
   };
-  //Сортировать массив idsFillStrip на некорректные значения.
-  private sortBordersFillStrips = () => {
+
+  private sortIdFillStrips = () => {
     if (this.data.idsFillStrip) {
-      //Округляем выходящие за пределы ролика значения.
-      this.data.idsFillStrip = this.data.idsFillStrip.map((number): number => {
-        let leftBorder = number;
-        if (leftBorder > (this.data.handles as IHandles[]).length)
-          leftBorder = (this.data.handles as IHandles[]).length;
-        if (leftBorder < 0) leftBorder = 0;
-        return leftBorder;
+      //Выкидывать выходящие за пределы ролика значения.
+      this.data.idsFillStrip = this.data.idsFillStrip.filter((id) => {
+        return !(id > (this.data.handles as IHandles[]).length || id < 0);
       });
       //Выкидываем из массива повторяющиеся элементы.
       this.data.idsFillStrip = this.data.idsFillStrip.filter(
-        (number, index, array) => {
-          return array.indexOf(number) === index;
+        (id, index, array) => {
+          return array.indexOf(id) === index;
         }
       );
       //сортировка по возростанию.

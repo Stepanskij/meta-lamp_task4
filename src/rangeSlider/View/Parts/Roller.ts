@@ -14,12 +14,12 @@ class Roller implements IViewPart {
   }
 
   build = ({ DOMContainer }: { DOMContainer: HTMLDivElement }) => {
-    const DOMSliderRoller = document.createElement("div");
-    DOMSliderRoller.className = "range-slider__slider-roller";
+    const DOMRoller = document.createElement("div");
+    DOMRoller.className = "roller";
 
-    DOMContainer.insertAdjacentElement("beforeend", DOMSliderRoller);
+    DOMContainer.insertAdjacentElement("beforeend", DOMRoller);
 
-    this.DOMRoot = DOMSliderRoller;
+    this.DOMRoot = DOMRoller;
   };
 
   calculateStyles = () => {};

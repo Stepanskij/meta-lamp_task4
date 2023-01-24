@@ -1,0 +1,37 @@
+@import "./sliderPartsStyleArguments.scss";
+
+.scale-mark {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  &__separator {
+    height: 15px;
+    width: 2px;
+    background-color: black;
+  }
+
+  &__value {
+    font-size: $font-size;
+    user-select: none;
+  }
+}
+
+.range-slider_vertical .scale-mark {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+
+  &__separator {
+    width: 15px;
+    height: 2px;
+    background-color: black;
+  }
+
+  &__value {
+    font-size: $font-size;
+    user-select: none;
+  }
+}

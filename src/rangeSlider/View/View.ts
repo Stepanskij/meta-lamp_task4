@@ -36,17 +36,21 @@ class View {
     this.parts.push(roller);
 
     modelData.handles?.forEach((handleObj, id) => {
-      const handle = new Handle({ view, id, sliderRoller: roller });
+      const handle = new Handle({ view, id, roller: roller });
       this.parts.push(handle);
     });
 
-    modelData.scaleData?.markArray?.forEach((handleObj, id) => {
-      const scaleMarker = new ScaleMarker({ view, id });
+    modelData.scaleData?.markArray?.forEach((markNumber, id) => {
+      const scaleMarker = new ScaleMarker({ view, id, roller: roller });
       this.parts.push(scaleMarker);
     });
 
-    modelData.idsFillStrip?.forEach((handleObj, id) => {
-      const fillStrip = new FillStrip({ view, id, sliderRoller: roller });
+    modelData.idsFillStrip?.forEach((fillStripId) => {
+      const fillStrip = new FillStrip({
+        view,
+        id: fillStripId,
+        roller: roller,
+      });
       this.parts.push(fillStrip);
     });
   };

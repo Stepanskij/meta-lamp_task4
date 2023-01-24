@@ -1,0 +1,17 @@
+@import "./sliderPartsStyleArguments.scss";
+
+.handle {
+  position: absolute;
+  width: $handle-size;
+  height: $handle-size;
+  border-radius: $handle-size/2;
+  background-color: aquamarine;
+  user-select: none;
+  z-index: 1;
+
+  &__tooltip {
+    position: absolute;
+    font-size: $font-size;
+    user-select: none;
+  }
+}

@@ -19,14 +19,14 @@ class RollerHandler {
     this.rollerPart = rollerPart;
   }
 
-  addEvent = (DOMSliderRoller: HTMLDivElement) => {
-    DOMSliderRoller.addEventListener("click", this.handleMouseClick);
-    DOMSliderRoller.addEventListener("touchstart", this.handleMouseClick);
+  addEvent = (DOMRoller: HTMLDivElement) => {
+    DOMRoller.addEventListener("click", this.handleMouseClick);
+    DOMRoller.addEventListener("touchstart", this.handleMouseClick);
   };
 
-  removeEvent = (DOMSliderRoller: HTMLDivElement) => {
-    DOMSliderRoller.removeEventListener("click", this.handleMouseClick);
-    DOMSliderRoller.removeEventListener("touchstart", this.handleMouseClick);
+  removeEvent = (DOMRoller: HTMLDivElement) => {
+    DOMRoller.removeEventListener("click", this.handleMouseClick);
+    DOMRoller.removeEventListener("touchstart", this.handleMouseClick);
   };
 
   handleMouseClick = (eventDown: UIEvent) => {

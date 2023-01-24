@@ -12,7 +12,9 @@ const userSliderData: IUserModelData = {
   stepSize: 5,
   numberGaps: 3,
   handlesCanPushed: true,
-  handles: [-12, 30],
+  /* isVertical: true, */
+  idsFillStrip: [0, 3, 4],
+  handles: [-12, 30, 50],
 };
 
 const DOMTestSlider1: HTMLDivElement | null =
