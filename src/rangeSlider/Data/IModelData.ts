@@ -1,13 +1,12 @@
-import IHandles from "./IHandles";
 import IScaleData from "./IScaleData";
 
 interface IModelData {
   numberRounding?: number;
   maxValue?: number;
   minValue?: number;
-  stepSize?: number;
-  maxSteps?: number;
-  handles?: IHandles[];
+  shiftStepSize?: number;
+  maxShiftSteps?: number;
+  handles?: number[];
   handlesCanPushed?: boolean;
   isVertical?: boolean;
   scaleData?: IScaleData;

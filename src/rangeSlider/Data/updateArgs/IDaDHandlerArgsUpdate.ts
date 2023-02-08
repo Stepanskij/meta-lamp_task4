@@ -6,6 +6,8 @@ interface IDnDArgsUpdate {
   eventElementId: number;
   rightShiftX: number;
   upShiftY: number;
+  mousePositionRelativeCenterHandleX:number;
+  mousePositionRelativeCenterHandleY:number;
 }
 
 export default IDnDArgsUpdate;

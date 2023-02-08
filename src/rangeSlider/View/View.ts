@@ -20,7 +20,7 @@ class View {
     onRollerClick: new Event<IRollerHandlerArgsUpdate>(),
   };
 
-  public parts: IViewPart[] = [];
+  parts: IViewPart[] = [];
   DOMRoot: HTMLDivElement = document.createElement("div");
 
   constructor() {}
@@ -35,8 +35,8 @@ class View {
     const roller = new Roller({ view });
     this.parts.push(roller);
 
-    modelData.handles?.forEach((handleObj, id) => {
-      const handle = new Handle({ view, id, roller: roller });
+    modelData.handles?.forEach((handleValue, id) => {
+      const handle = new Handle({ view, id, rollerPart: roller });
       this.parts.push(handle);
     });
 
@@ -71,22 +71,19 @@ class View {
     });
   };
 
-  render = ({ modelData }: { modelData: IModelData }) => {
-    this.DOMRoot.classList.toggle(
-      "range-slider_vertical",
-      modelData.isVertical
-    );
-
-    this.parts.forEach((part) => {
-      part.render({ modelData });
-    });
-  };
-
-  renderView = (modelData?: EventArgs<IModelData>) => {
+  render = (modelData?: EventArgs<IModelData>) => {
     if (modelData) {
       const newModelData = { ...modelData.data };
+      this.DOMRoot.classList.toggle(
+        "range-slider_vertical",
+        newModelData.isVertical
+      );
+
       this.calculateStyles({ modelData: newModelData });
-      this.render({ modelData: newModelData });
+
+      this.parts.forEach((part) => {
+        part.render({ modelData: newModelData });
+      });
     }
   };
 }

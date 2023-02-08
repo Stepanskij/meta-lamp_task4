@@ -9,7 +9,7 @@ class Handle implements IViewPart {
   view: View;
   DOMRoot: HTMLDivElement | undefined;
   private id: number;
-  private roller: Roller;
+  private rollerPart: Roller;
   private shiftLeft: number = 0;
 
   public DnDHandler: DragAndDropHandler;
@@ -17,19 +17,19 @@ class Handle implements IViewPart {
   constructor({
     view,
     id,
-    roller,
+    rollerPart,
   }: {
     view: View;
     id: number;
-    roller: Roller;
+    rollerPart: Roller;
   }) {
     this.view = view;
     this.id = id;
-    this.roller = roller;
+    this.rollerPart = rollerPart;
     this.DnDHandler = new DragAndDropHandler({
       view: this.view,
       handlePart: this,
-      roller: this.roller,
+      rollerPart: this.rollerPart,
     });
   }
 
@@ -48,12 +48,18 @@ class Handle implements IViewPart {
   };
 
   calculateStyles = ({ modelData }: { modelData: IModelData }) => {
-    const roller = this.roller.DOMRoot as HTMLDivElement;
+    const rollerPart = this.rollerPart.DOMRoot as HTMLDivElement;
 
-    if (modelData.handles && modelData.maxSteps) {
-      this.shiftLeft =
-        ((modelData.handles[this.id].step as number) / modelData.maxSteps) *
-        100;
+    if (
+      modelData.handles &&
+      modelData.maxShiftSteps &&
+      modelData.maxValue !== undefined &&
+      modelData.minValue !== undefined
+    ) {
+      const rollerLength = modelData.maxValue - modelData.minValue;
+      const handleShift = modelData.handles[this.id] - modelData.minValue;
+
+      this.shiftLeft = Math.round((handleShift * 100) / rollerLength);
     }
   };
 
@@ -62,12 +68,10 @@ class Handle implements IViewPart {
     const DOMHandleTooltip = this.DOMRoot?.querySelector(
       ".handle__tooltip"
     ) as HTMLDivElement;
-    const DOMRoller = this.roller.DOMRoot as HTMLDivElement;
+    const DOMRoller = this.rollerPart.DOMRoot as HTMLDivElement;
 
     if (modelData.handles) {
-      DOMHandleTooltip.innerHTML = `${
-        modelData.handles[this.id].value as number
-      }`;
+      DOMHandleTooltip.innerHTML = `${modelData.handles[this.id]}`;
 
       if (!modelData.isVertical) {
         DOMHandle.setAttribute(
@@ -100,10 +104,6 @@ class Handle implements IViewPart {
           }px)`
         );
       }
-
-      DOMHandleTooltip.innerHTML = `${
-        modelData.handles[this.id].value as number
-      }`;
     }
   };
 

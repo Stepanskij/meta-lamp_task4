@@ -45,24 +45,33 @@ class FillStrip implements IViewPart {
   calculateStyles = ({ modelData }: { modelData: IModelData }) => {
     let styleLeftBorder = 0;
     let styleRightBorder = 100;
-    const idLeftHandle = this.id - 1;
-    const idRightHandle = this.id;
+
     //
-    if (modelData.handles && modelData.maxSteps) {
-      if (idLeftHandle > 0) {
-        styleLeftBorder =
-          ((modelData.handles[this.id - 1].step as number) /
-            modelData.maxSteps) *
-          100;
+    if (
+      modelData.handles &&
+      modelData.maxShiftSteps &&
+      modelData.maxValue !== undefined &&
+      modelData.minValue !== undefined
+    ) {
+      const rollerLength = modelData.maxValue - modelData.minValue;
+
+      if (this.id > 0 && modelData.handles[this.id - 1] !== undefined) {
+        styleLeftBorder = Math.round(
+          ((modelData.handles[this.id - 1] - modelData.minValue) * 100) /
+            rollerLength
+        );
       }
-      if (idRightHandle < modelData.handles.length) {
-        styleRightBorder =
-          ((modelData.handles[this.id].step as number) / modelData.maxSteps) *
-          100;
+      if (
+        this.id < modelData.handles.length &&
+        modelData.handles[this.id ] !== undefined
+      ) {
+        styleRightBorder = Math.round(
+          ((modelData.handles[this.id] - modelData.minValue) * 100) /
+            rollerLength
+        );
       }
     }
     //
-
     this.styleLeft = styleLeftBorder;
     this.styleWidth = styleRightBorder - styleLeftBorder;
   };

@@ -1,28 +1,52 @@
 import "./example.scss";
 
-import IDOMsOfInputs from "./IDOMsOfInputs";
 import IUserModelData from "rangeSlider/Data/IUserModelData";
 
 import Controller from "rangeSlider/Controller/Controller";
-import inputsHandle from "./inputsHandle";
 
 const userSliderData: IUserModelData = {
   maxValue: 100,
   minValue: -100,
-  stepSize: 5,
+  shiftStepSize: 5,
   numberGaps: 3,
   handlesCanPushed: true,
-  /* isVertical: true, */
-  idsFillStrip: [0, 3, 4],
-  handles: [-12, 30, 50],
+  isVertical: true,
+  idsFillStrip: [0],
+  handles: [-90,20],
 };
 
 const DOMTestSlider1: HTMLDivElement | null =
   document.querySelector(".example__slider");
+
 const slider1 = new Controller(
   DOMTestSlider1 as HTMLDivElement,
   userSliderData
 );
+
+const inputsContainer = document.querySelector(".example__inputs2");
+const inputs = slider1.model.data.handles?.map((handleValue, i) => {
+  const input = document.createElement("input");
+  input.type = "number";
+  input.max = String(slider1.model.data.maxValue);
+  input.min = String(slider1.model.data.minValue);
+  input.value = String(handleValue);
+  input.classList.add("example__input");
+
+  inputsContainer?.append(input);
+
+  slider1.model.customEvents.onUpdate.subscribe((e) => {
+    if (e?.data.handles) {
+      input.value = String(e?.data.handles[i]);
+    }
+  });
+
+  input.addEventListener("change", () => {
+    let inputValue = Number(input.value);
+    slider1.model.updateHandle({ handleId: i, relativeValue: inputValue });
+    // slider1.view.customEvents.onHandleMove.dispatch(/* значение ползунка в нужном формате */);
+  });
+});
+
 /* 
 const DOMsInputs: IDOMsOfInputs = {};
 //

@@ -57,9 +57,10 @@ class RollerHandler {
       const rollerPageY = this.getPositionElement(this.rollerPart.DOMRoot).top; //Верхний отступ ролика относительно страницы.
 
       this.clickArgs.rightShiftX = pageX - rollerPageX; //Сдвиг мыши вправо относительно начала ролика, px.
-      this.clickArgs.upShiftY = pageY - rollerPageY; //Сдвиг мыши вверх относительно начала ролика, px.
+      this.clickArgs.upShiftY =
+        this.clickArgs.rollerHeight - (pageY - rollerPageY); //Сдвиг мыши вверх относительно начала ролика, px.
     }
-    
+
     this.view.customEvents.onRollerClick.dispatch(
       new EventArgs({ ...this.clickArgs })
     );

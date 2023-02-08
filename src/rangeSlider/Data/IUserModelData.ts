@@ -1,9 +1,8 @@
 
 interface IUserModelData {
-  numberRounding?: number;
   maxValue?: number;
   minValue?: number;
-  stepSize?: number;
+  shiftStepSize?: number;
   handles?: number[];
   handlesCanPushed?: boolean;
   isVertical?: boolean;
